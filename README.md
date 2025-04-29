@@ -156,23 +156,3 @@ except AuthenticationException:
 except MoySkladException as e:
     print(f"API error: {e.status_code} - {e.error_message}")
 ```
-
-## Custom Repositories
-
-```python
-from moysklad_api.entities.base import MetaEntity, Meta
-from dataclasses import dataclass
-
-# Define a custom entity
-@dataclass
-class CustomEntity(MetaEntity):
-    entity_name: ClassVar[str] = "entity/customentity/your_custom_entity"
-    # Add your custom fields here
-    custom_field: Optional[str] = None
-
-# Create a repository for the custom entity
-custom_repo = client.create_repository("entity/customentity/your_custom_entity", CustomEntity)
-
-# Use the repository
-custom_entities, meta = custom_repo.find_all()
-```
