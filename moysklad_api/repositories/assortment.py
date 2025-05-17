@@ -8,7 +8,7 @@ from .base import EntityRepository
 from ..api_client import ApiClient
 from ..entities.assortment import Assortment, Service, Bundle
 from ..entities.products import Product, Variant
-from ..entities.base import Meta
+from ..entities.base import Meta, ListEntity
 from ..query import QueryBuilder
 
 
@@ -119,6 +119,22 @@ class AssortmentRepository(EntityRepository[Assortment]):
         query.filter().eq("type", type_name)
 
         return self.find_all(query)
+
+    def get_all_active(self, all_pages=False) -> Tuple[List[Assortment], Meta]:
+        query = self.query()
+        query.filter().eq("archived", False)
+
+        assortments, meta = self.find_all(query)
+
+        if all_pages:
+            while meta.nextHref:
+                next_endpoint = meta.nextHref.removeprefix(self.api_client.config.base_url)
+                response = self.api_client.get(next_endpoint)
+                next_page = ListEntity.from_dict(response, Assortment)
+                meta = next_page.meta
+                assortments.extend(next_page.rows)
+
+        return assortments, meta
 
     def get_products(self, query_builder: Optional[QueryBuilder] = None) -> Tuple[List[Assortment], Meta]:
         """

@@ -75,6 +75,9 @@ class CustomerOrder(BaseDocument):
     shipmentAddress: Optional[Dict] = None
     shipmentAddressFull: Optional[Dict] = None
     shippedSum: Optional[Decimal] = None
+    demands: Optional[List[Dict]] = None
+    contract: Optional[Dict] = None
+    salesChannel: Optional[Dict] = None
     syncId: Optional[str] = None
     taxSystem: Optional[str] = None
     vatEnabled: Optional[bool] = None
@@ -90,6 +93,35 @@ class CustomerOrder(BaseDocument):
     invoicedSum: Optional[int] = None
     reservedSum: Optional[int] = None
 
+@dataclass
+class PurchaseOrder(BaseDocument):
+    """Customer Order entity in MoySklad."""
+    entity_name: ClassVar[str] = "entity/customerorder"
+
+    store: Optional[Dict] = None
+    agent: Optional[Dict] = None
+    agentAccount: Optional[Dict] = None
+    shippedSum: Optional[Decimal] = None
+    supplies: Optional[List[Dict]] = None
+    internalOrder: Optional[Dict] = None
+    customerOrders: Optional[List[Dict]] = None
+    contract: Optional[Dict] = None
+    payments: Optional[List[Dict]] = None
+    salesChannel: Optional[Dict] = None
+    syncId: Optional[str] = None
+    taxSystem: Optional[str] = None
+    vatEnabled: Optional[bool] = None
+    vatIncluded: Optional[bool] = None
+    vatSum: Optional[Decimal] = None
+    waitSum: Optional[Decimal] = None
+    organization: Optional[Dict] = None
+    organizationAccount: Optional[Dict] = None
+    positions: Optional[Dict] = None
+    deliveryPlannedMoment: Optional[datetime] = None
+    payedSum: Optional[int] = None
+    invoicesOut: Optional[List[Dict]] = None
+    invoicedSum: Optional[int] = None
+    reservedSum: Optional[int] = None
 
 @dataclass
 class InvoiceOut(BaseDocument):

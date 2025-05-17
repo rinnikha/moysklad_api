@@ -23,6 +23,12 @@ client = MoySklad(
     debug=True
 )
 
+query = client.counterparties.query()
+
+query.limit(100).offset(0)
+
+counterparties, _ = client.counterparties.find_all(query)
+
 # Get current user info
 current_employee = client.employees.get_current()
 print(f"Logged in as: {current_employee.fullName}")

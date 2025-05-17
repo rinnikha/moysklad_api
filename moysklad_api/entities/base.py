@@ -8,14 +8,16 @@ from typing import Dict, List, Any, Optional, ClassVar, Type, TypeVar, Generic
 from decimal import Decimal
 import json
 
-def _convert_decimal_for_json(obj):
-    """Convert decimal to float for JSON serialization."""
+def _convert_for_json(obj):
+    """Convert special types to JSON-serializable formats."""
     if isinstance(obj, Decimal):
         return float(obj)
+    elif isinstance(obj, datetime):
+        return obj.isoformat()  # Converts to ISO 8601 format string
     elif isinstance(obj, dict):
-        return {k: _convert_decimal_for_json(v) for k, v in obj.items()}
+        return {k: _convert_for_json(v) for k, v in obj.items()}
     elif isinstance(obj, list):
-        return [_convert_decimal_for_json(item) for item in obj]
+        return [_convert_for_json(item) for item in item]
     return obj
 
 
@@ -29,6 +31,7 @@ class Meta:
     uuidHref: Optional[str] = None
     downloadHref: Optional[str] = None
     nextHref: Optional[str] = None
+    previousHref: Optional[str] = None
     size: Optional[int] = None
     limit: Optional[int] = None
     offset: Optional[int] = None
@@ -53,6 +56,7 @@ class MetaEntity:
     meta: Optional[Meta] = None
     id: Optional[str] = None
     accountId: Optional[str] = None
+    attributes: Optional[List[Dict]] = None
     created: Optional[datetime] = None
     updated: Optional[datetime] = None
     name: Optional[str] = None
@@ -81,8 +85,9 @@ class MetaEntity:
         # Remove None values
         filtered_data = {k: v for k, v in data.items() if v is not None}
 
-        # Convert Decimal objects to float for JSON serialization
-        return _convert_decimal_for_json(filtered_data)
+        # Convert special types (Decimal, datetime) for JSON serialization
+        return _convert_for_json(filtered_data)
+
 
     @classmethod
     def from_dict(cls, data: Dict) -> 'MetaEntity':

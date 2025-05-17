@@ -3,6 +3,7 @@ Counterparty-related entity models for the MoySklad API.
 """
 
 from dataclasses import dataclass, field
+from datetime import datetime
 from typing import Dict, List, Any, Optional, ClassVar
 
 from .base import Meta, MetaEntity
@@ -14,12 +15,14 @@ class ContactPerson(MetaEntity):
     """Contact person entity in MoySklad."""
     entity_name: ClassVar[str] = "entity/counterparty/contactperson"
 
+
     description: Optional[str] = None
     externalCode: Optional[str] = None
     email: Optional[str] = None
     phone: Optional[str] = None
     position: Optional[str] = None
     agent: Optional[Dict] = None
+
 
 
 @dataclass
@@ -69,6 +72,16 @@ class Counterparty(MetaEntity):
     priceType: Optional[Dict] = None
     created: Optional[str] = None
     description: Optional[str] = None
+    actualAddressFull: Optional[Dict] = None
+
+    birthDate: Optional[datetime] = None
+    certificateDate: Optional[datetime] = None
+    certificateNumber: Optional[str] = None
+    legalAddressFull: Optional[Dict] = None
+    legalFirstName: Optional[str] = None
+    legalLastName: Optional[str] = None
+    legalMiddleName: Optional[str] = None
+    sex: Optional[str] = None
 
     owner: Optional[Dict] = None
     shared: Optional[bool] = None

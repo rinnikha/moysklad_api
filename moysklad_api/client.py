@@ -25,7 +25,7 @@ from .repositories.documents import (
     CashInRepository,
     CashOutRepository,
     PaymentInRepository,
-    PaymentOutRepository
+    PaymentOutRepository, PurchaseOrderRepository
 )
 from .repositories.counterparty import CounterpartyRepository
 from .repositories.organization import (
@@ -75,6 +75,7 @@ class MoySklad:
 
         # Documents
         self.customer_orders = CustomerOrderRepository(self.api_client)
+        self.purchase_orders = PurchaseOrderRepository(self.api_client)
         self.invoiceouts = InvoiceOutRepository(self.api_client)
         self.demands = DemandRepository(self.api_client)
         self.supplies = SupplyRepository(self.api_client)

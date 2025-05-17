@@ -14,6 +14,7 @@ from .products import (
 )
 from .documents import (
     CustomerOrder,
+    PurchaseOrder,
     InvoiceOut,
     Demand,
     Supply,

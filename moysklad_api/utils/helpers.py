@@ -3,9 +3,37 @@ Helper functions for the MoySklad API.
 """
 
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from typing import Optional, Union
 
+MS_FORMAT = "%Y-%m-%d %H:%M"
+
+
+def ms_datetime_to_string(date: Union[datetime, str]) -> str:
+    if date is None:
+        return None
+
+        # If it's already a datetime object
+    if isinstance(date, datetime):
+        # Adjust timezone by subtracting 2 hours
+        adjusted_date = date - timedelta(hours=2)
+        return adjusted_date.strftime(MS_FORMAT)
+    return str(date)
+
+def ms_string_to_datetime(date_str: Optional[str]) -> Optional[datetime]:
+    if date_str is None or not date_str:
+        return None
+
+    try:
+        # Parse the string to datetime
+        dt = datetime.strptime(date_str, MS_FORMAT)
+
+        # Adjust timezone by adding 2 hours (inverse of the subtraction in ms_datetime_to_string)
+        adjusted_dt = dt + timedelta(hours=2)
+        return adjusted_dt
+    except ValueError:
+        # Handle parsing errors - could raise an exception or return None depending on your needs
+        return None
 
 def format_date(date: Union[datetime, str]) -> str:
     """

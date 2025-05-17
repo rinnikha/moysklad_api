@@ -13,6 +13,7 @@ from .products import (
 )
 from .documents import (
     CustomerOrderRepository,
+    PurchaseOrderRepository,
     InvoiceOutRepository,
     DemandRepository,
     SupplyRepository,
