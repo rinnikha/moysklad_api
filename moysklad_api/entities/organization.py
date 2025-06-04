@@ -59,6 +59,10 @@ class Organization(MetaEntity):
     created: Optional[str] = None
     updated: Optional[str] = None
 
+    @staticmethod
+    def get_href(entity_id: str) -> str:
+        return f'https://api.moysklad.ru/api/remap/1.2/entity/organization/{entity_id}'
+
     def __post_init__(self):
         """Post-initialization hook."""
         super().__post_init__()
@@ -69,6 +73,9 @@ class Organization(MetaEntity):
                 self.companyType = CompanyType(self.companyType)
             except ValueError:
                 pass
+
+
+
 
 
 @dataclass
@@ -110,6 +117,10 @@ class Group(MetaEntity):
 
     index: Optional[int] = None
 
+    @staticmethod
+    def get_href(entity_id: str) -> str:
+        return f'https://api.moysklad.ru/api/remap/1.2/entity/group/{entity_id}'
+
 
 @dataclass
 class Store(MetaEntity):
@@ -130,3 +141,7 @@ class Store(MetaEntity):
     shared: Optional[bool] = None
     zones: Optional[List[Dict]] = None
     slots: Optional[List[Dict]] = None
+
+    @staticmethod
+    def get_href(entity_id: str) -> str:
+        return f'https://api.moysklad.ru/api/remap/1.2/entity/store/{entity_id}'

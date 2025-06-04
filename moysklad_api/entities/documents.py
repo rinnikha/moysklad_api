@@ -4,6 +4,7 @@ Document-related entity models for the MoySklad API.
 
 from dataclasses import dataclass, field
 from datetime import datetime
+from numbers import Number
 from typing import Dict, List, Any, Optional, ClassVar
 from decimal import Decimal
 
@@ -36,6 +37,17 @@ class Position(MetaEntity):
         if isinstance(self.discount, (str, int, float)):
             self.discount = Decimal(str(self.discount))
 
+@dataclass
+class State(MetaEntity):
+    """Document state entity in MoySklad."""
+    color: Optional[Number] = None
+    stateType: Optional[str] = None
+    entityType: Optional[str] = None
+
+    @staticmethod
+    def get_href(entity_id: str, entity_type: str) -> str:
+        return f'https://api.moysklad.ru/api/remap/1.2/entity/{entity_type}/metadata/states/{entity_id}'
+
 
 @dataclass
 class BaseDocument(MetaEntity):
@@ -45,7 +57,7 @@ class BaseDocument(MetaEntity):
     group: Optional[Dict] = None
     description: Optional[str] = None
     externalCode: Optional[str] = None
-    moment: Optional[str] = None
+    moment: Optional[datetime] = None
     applicable: Optional[bool] = None
     rate: Optional[Dict] = None
     sum: Optional[Decimal] = None
@@ -87,7 +99,7 @@ class CustomerOrder(BaseDocument):
     organizationAccount: Optional[Dict] = None
     agentAccount: Optional[Dict] = None
     positions: Optional[Dict] = None
-    deliveryPlannedMoment: Optional[str] = None
+    deliveryPlannedMoment: Optional[datetime] = None
     payedSum: Optional[int] = None
     invoicesOut: Optional[List[Dict]] = None
     invoicedSum: Optional[int] = None
@@ -133,7 +145,7 @@ class InvoiceOut(BaseDocument):
     organizationAccount: Optional[Dict] = None
     agentAccount: Optional[Dict] = None
     positions: Optional[Dict] = None
-    paymentPlannedMoment: Optional[str] = None
+    paymentPlannedMoment: Optional[datetime] = None
     payments: Optional[List[Dict]] = None
     demands: Optional[List[Dict]] = None
     customerOrder: Optional[Dict] = None

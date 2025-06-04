@@ -8,17 +8,23 @@ from typing import Dict, List, Any, Optional, ClassVar, Type, TypeVar, Generic
 from decimal import Decimal
 import json
 
+from ..utils.helpers import ms_datetime_to_string
+
+
 def _convert_for_json(obj):
-    """Convert special types to JSON-serializable formats."""
+    """Convert special types to JSON-serializable formats and remove None values."""
     if isinstance(obj, Decimal):
         return float(obj)
     elif isinstance(obj, datetime):
-        return obj.isoformat()  # Converts to ISO 8601 format string
+        return ms_datetime_to_string(obj)  # Converts to ISO 8601 format string
     elif isinstance(obj, dict):
-        return {k: _convert_for_json(v) for k, v in obj.items()}
+        # Filter out None values in dictionaries at any nesting level
+        return {k: _convert_for_json(v) for k, v in obj.items() if v is not None}
     elif isinstance(obj, list):
-        return [_convert_for_json(item) for item in item]
+        # Process each item in the list
+        return [_convert_for_json(item) for item in obj]
     return obj
+
 
 
 @dataclass
@@ -64,6 +70,7 @@ class MetaEntity:
     # Class variable to store entity type name
     entity_name: ClassVar[str] = ""
 
+
     def __post_init__(self):
         """
         Post-initialization hook to convert dict to Meta object
@@ -82,11 +89,8 @@ class MetaEntity:
         # Convert to dict using dataclasses.asdict
         data = asdict(self)
 
-        # Remove None values
-        filtered_data = {k: v for k, v in data.items() if v is not None}
-
         # Convert special types (Decimal, datetime) for JSON serialization
-        return _convert_for_json(filtered_data)
+        return _convert_for_json(data)
 
 
     @classmethod

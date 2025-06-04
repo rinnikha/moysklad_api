@@ -58,18 +58,22 @@ class CustomerOrderRepository(EntityRepository[CustomerOrder]):
 
         return self.find_all(query)
 
-    def get_positions(self, order_id: str) -> Tuple[List[Position], Meta]:
+    def get_positions(self, order_id: str, query_builder: Optional[QueryBuilder] = None) -> Tuple[List[Position], Meta]:
         """
         Get order positions.
 
         Args:
             order_id: Order ID
+            query_builder: Query builder for filtering, sorting, etc.
 
         Returns:
             Positions data
         """
 
-        response = self.api_client.get(f"{self.entity_name}/{order_id}/positions")
+        params = query_builder if query_builder else self.query()
+        params.expand("assortment")
+
+        response = self.api_client.get(f"{self.entity_name}/{order_id}/positions", params=params.to_params())
 
         list_positions = ListEntity.from_dict(response, Position)
 

@@ -6,8 +6,7 @@ import uuid
 from datetime import datetime, timezone, timedelta
 from typing import Optional, Union
 
-MS_FORMAT = "%Y-%m-%d %H:%M"
-
+MS_FORMAT = "%Y-%m-%d %H:%M:00"
 
 def ms_datetime_to_string(date: Union[datetime, str]) -> str:
     if date is None:
