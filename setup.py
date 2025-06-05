@@ -10,8 +10,8 @@ with open("README.md", "r", encoding="utf-8") as fh:
 setup(
     name="r-moysklad-api",
     version="0.1.0",
-    author="Your Name",
-    author_email="your.email@example.com",
+    author="Rustam Minnikhanov",
+    author_email="minnikhanovrusdev@gmail.com",
     description="A comprehensive Python client for the MoySklad JSON API",
     long_description=long_description,
     long_description_content_type="text/markdown",
