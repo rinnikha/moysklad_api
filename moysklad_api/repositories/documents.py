@@ -80,6 +80,26 @@ class CustomerOrderRepository(EntityRepository[CustomerOrder]):
 
         return list_positions.rows, list_positions.meta
 
+    def get_agent(self, order_id: str, expand=False) -> Counterparty:
+        """
+        Get order agent.
+
+        Args:
+            order_id: Order ID
+            expand: Expand bool
+
+        Returns:
+            Counterparty meta, if expand is true, then full Counterparty data
+        """
+        params = self.query()
+
+        if expand:
+            params.expand("agent")
+
+        response = self.api_client.get(f"{self.entity_name}/{order_id}", params=params.to_params())
+
+        return Counterparty.from_dict(response['agent'])
+
     def create_position(self, order_id: str, position_data: Position) -> Dict:
         """
         Create order position.
@@ -121,124 +141,6 @@ class CustomerOrderRepository(EntityRepository[CustomerOrder]):
         """
         self.api_client.delete(f"{self.entity_name}/{order_id}/positions/{position_id}")
 
-    class CustomerOrderRepository(EntityRepository[CustomerOrder]):
-        """Repository for CustomerOrder entities."""
-
-        def __init__(self, api_client: ApiClient):
-            """
-            Initialize customer order repository.
-
-            Args:
-                api_client: API client instance
-            """
-            super().__init__(api_client, "entity/customerorder", CustomerOrder)
-
-        def get_metadata(self) -> Dict:
-            """
-            Get customer order metadata.
-
-            Returns:
-                Metadata dictionary
-            """
-            return self.api_client.get(f"{self.entity_name}/metadata")
-
-        def get_by_agent(self, agent_id: str, query_builder: Optional[QueryBuilder] = None) -> Tuple[
-            List[CustomerOrder], Meta]:
-            """
-            Get orders by agent (counterparty).
-
-            Args:
-                agent_id: Agent (counterparty) ID
-                query_builder: Query builder for filtering, sorting, etc.
-
-            Returns:
-                Tuple of (list of orders, metadata)
-            """
-            query = query_builder or self.query()
-            query.filter().eq("agent.id", agent_id)
-
-            return self.find_all(query)
-
-        def get_positions(self, order_id: str, query_builder: Optional[QueryBuilder] = None) -> Tuple[List[Position], Meta]:
-            """
-            Get order positions.
-
-            Args:
-                order_id: Order ID
-                query_builder: Query builder for filtering, sorting, etc.
-
-            Returns:
-                Positions data
-            """
-
-            params = query_builder if query_builder else self.query()
-            params.expand("assortment")
-            response = self.api_client.get(f"{self.entity_name}/{order_id}/positions", params=params.to_params())
-
-            list_positions = ListEntity.from_dict(response, Position)
-
-            return list_positions.rows, list_positions.meta
-
-        def get_agent(self, order_id: str, expand=False) -> Counterparty:
-            """
-            Get order agent.
-
-            Args:
-                order_id: Order ID
-                expand: Expand bool
-
-            Returns:
-                Counterparty meta, if expand is true, then full Counterparty data
-            """
-            params = self.query()
-
-            if expand:
-                params.expand("agent")
-
-            response = self.api_client.get(f"{self.entity_name}/{order_id}", params=params.to_params())
-
-            return Counterparty.from_dict(response['agent'])
-
-        def create_position(self, order_id: str, position_data: Position) -> Dict:
-            """
-            Create order position.
-
-            Args:
-                order_id: Order ID
-                position_data: Position data
-
-            Returns:
-                Created position data
-            """
-
-            data = position_data.to_dict()
-            response = self.api_client.post(f"{self.entity_name}/{order_id}/positions", data=data)
-
-            return Position.from_dict(response[0])
-
-        def update_position(self, order_id: str, position_id: str, position_data: Dict) -> Dict:
-            """
-            Update order position.
-
-            Args:
-                order_id: Order ID
-                position_id: Position ID
-                position_data: Position data
-
-            Returns:
-                Updated position data
-            """
-            return self.api_client.put(f"{self.entity_name}/{order_id}/positions/{position_id}", data=position_data)
-
-        def delete_position(self, order_id: str, position_id: str) -> None:
-            """
-            Delete order position.
-
-            Args:
-                order_id: Order ID
-                position_id: Position ID
-            """
-            self.api_client.delete(f"{self.entity_name}/{order_id}/positions/{position_id}")
 
 
 class PurchaseOrderRepository(EntityRepository[PurchaseOrder]):
