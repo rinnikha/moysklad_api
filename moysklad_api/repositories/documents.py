@@ -4,6 +4,7 @@ Document-related repositories for the MoySklad API.
 from http.client import responses
 from typing import Dict, List, Any, Optional, Tuple
 
+from build.lib.moysklad_api.entities import Counterparty
 from .base import EntityRepository
 from ..api_client import ApiClient
 from ..entities.documents import (
@@ -177,6 +178,26 @@ class CustomerOrderRepository(EntityRepository[CustomerOrder]):
             list_positions = ListEntity.from_dict(response, Position)
 
             return list_positions.rows, list_positions.meta
+
+        def get_agent(self, order_id: str, expand=False) -> Counterparty:
+            """
+            Get order agent.
+
+            Args:
+                order_id: Order ID
+                expand: Expand bool
+
+            Returns:
+                Counterparty meta, if expand is true, then full Counterparty data
+            """
+            params = self.query()
+
+            if expand:
+                params.expand("agent")
+
+            response = self.api_client.get(f"{self.entity_name}/{order_id}", params=params.to_params())
+
+            return Counterparty.from_dict(response['agent'])
 
         def create_position(self, order_id: str, position_data: Position) -> Dict:
             """
