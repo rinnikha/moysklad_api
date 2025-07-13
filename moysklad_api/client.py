@@ -138,6 +138,19 @@ class MoySklad:
         """
         return self.api_client.get("audit", params=params)
 
+    def get_audit_events(self, audit_id: str, params: Optional[Dict] = None) -> Dict:
+        """
+        Get audit events by id.
+
+        Args:
+            audit_id: Audit ID
+            params: Query parameters
+
+        Returns:
+            Audit events
+        """
+        return self.api_client.get(f"audit/{audit_id}/events", params=params)
+
     def search(self, query: str) -> Dict:
         """
         Perform a global search.

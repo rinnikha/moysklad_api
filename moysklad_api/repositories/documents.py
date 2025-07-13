@@ -4,7 +4,7 @@ Document-related repositories for the MoySklad API.
 from http.client import responses
 from typing import Dict, List, Any, Optional, Tuple
 
-from build.lib.moysklad_api.entities import Counterparty
+from ..entities import Counterparty
 from .base import EntityRepository
 from ..api_client import ApiClient
 from ..entities.documents import (
@@ -140,7 +140,6 @@ class CustomerOrderRepository(EntityRepository[CustomerOrder]):
             position_id: Position ID
         """
         self.api_client.delete(f"{self.entity_name}/{order_id}/positions/{position_id}")
-
 
 
 class PurchaseOrderRepository(EntityRepository[PurchaseOrder]):
