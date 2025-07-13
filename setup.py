@@ -8,7 +8,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setup(
-    name="r-moysklad-api",
+    name="moysklad-api",  # Changed from "r-moysklad-api"
     version="0.1.0",
     author="Rustam Minnikhanov",
     author_email="minnikhanovrusdev@gmail.com",
@@ -25,5 +25,6 @@ setup(
     python_requires=">=3.7",
     install_requires=[
         "requests>=2.25.0",
+        "python-dotenv>=0.19.0",
     ],
 )
