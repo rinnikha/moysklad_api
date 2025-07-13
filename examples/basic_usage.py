@@ -9,11 +9,11 @@ import os
 
 load_dotenv()
 
-from moysklad_api import MoySklad
-from moysklad_api.entities.products import Product
-from moysklad_api.entities.base import Meta
-from moysklad_api.entities.counterparty import Counterparty
-from moysklad_api.exceptions import NotFoundException
+from src import MoySklad
+from src.entities.products import Product
+from src.entities.base import Meta
+from src.entities.counterparty import Counterparty
+from src.exceptions import NotFoundException
 
 token = os.getenv("MOYSKLAD_TOKEN")
 
