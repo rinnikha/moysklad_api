@@ -2,11 +2,11 @@
 Advanced usage example for the MoySklad API client.
 """
 
-from src import MoySklad
-from src.entities.documents import CustomerOrder, Position, InvoiceOut, PaymentIn
-from src.entities.base import Meta
-from src.entities.counterparty import Counterparty, ContactPerson
-from src.entities.products import Product
+from moysklad_api import MoySklad
+from moysklad_api.entities.documents import CustomerOrder, Position, InvoiceOut, PaymentIn
+from moysklad_api.entities.base import Meta
+from moysklad_api.entities.counterparty import Counterparty, ContactPerson
+from moysklad_api.entities.products import Product
 
 from dotenv import load_dotenv
 import os

@@ -5,9 +5,9 @@ Example of working with the Assortment entity in MoySklad API.
 import sys
 import os
 
-from src import MoySklad
-from src.entities.base import Meta
-from src.entities.assortment import Assortment, Service, Bundle
+from moysklad_api import MoySklad
+from moysklad_api.entities.base import Meta
+from moysklad_api.entities.assortment import Assortment, Service, Bundle
 from decimal import Decimal
 
 from dotenv import load_dotenv
