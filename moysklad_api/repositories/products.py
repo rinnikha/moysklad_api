@@ -34,6 +34,22 @@ class ProductRepository(EntityRepository[Product]):
             Stock information
         """
         return self.api_client.get(f"{self.entity_name}/{product_id}/stock")
+    
+    def get_by_sku(self, sku: str) -> Product:
+        """
+        Find product by sku.
+
+        Args:
+            sku: Product sku string
+
+        Returns:
+            Product instance or None if not found
+        """
+        query = self.query()
+        query.filter().eq("article", sku)
+
+        products, _ = self.find_all(query)
+        return products[0] if products else None
 
     def get_by_barcode(self, barcode: str) -> Product:
         """
