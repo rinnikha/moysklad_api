@@ -21,11 +21,15 @@ from .repositories.documents import (
     CustomerOrderRepository,
     InvoiceOutRepository,
     DemandRepository,
+    PurchaseReturnRepository,
     SupplyRepository,
     CashInRepository,
     CashOutRepository,
     PaymentInRepository,
-    PaymentOutRepository, PurchaseOrderRepository
+    PaymentOutRepository,
+    CounterpartyAdjustmentRepository,
+    PurchaseOrderRepository,
+    SalesReturnRepository
 )
 from .repositories.counterparty import CounterpartyRepository
 from .repositories.organization import (
@@ -76,6 +80,8 @@ class MoySklad:
         # Documents
         self.customer_orders = CustomerOrderRepository(self.api_client)
         self.purchase_orders = PurchaseOrderRepository(self.api_client)
+        self.purchase_returns = PurchaseReturnRepository(self.api_client)
+        self.sales_returns = SalesReturnRepository(self.api_client)
         self.invoiceouts = InvoiceOutRepository(self.api_client)
         self.demands = DemandRepository(self.api_client)
         self.supplies = SupplyRepository(self.api_client)
@@ -86,6 +92,7 @@ class MoySklad:
 
         # Counterparties
         self.counterparties = CounterpartyRepository(self.api_client)
+        self.counterparty_adjustments = CounterpartyAdjustmentRepository(self.api_client)
 
         # Organization
         self.organizations = OrganizationRepository(self.api_client)

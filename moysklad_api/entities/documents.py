@@ -64,11 +64,8 @@ class BaseDocument(MetaEntity):
     syncId: Optional[str] = None
     project: Optional[Dict] = None
     state: Optional[Dict] = None
-    attributes: Optional[List[Dict]] = None
     deleted: Optional[bool] = None
     files: Optional[Dict] = None
-    created: Optional[datetime] = None
-    updated: Optional[datetime] = None
     printed: Optional[bool] = None
     published: Optional[bool] = None
 
@@ -134,6 +131,52 @@ class PurchaseOrder(BaseDocument):
     invoicesOut: Optional[List[Dict]] = None
     invoicedSum: Optional[int] = None
     reservedSum: Optional[int] = None
+
+
+@dataclass
+class PurchaseReturn(BaseDocument):
+    """Purchase Return entity in MoySklad."""
+    entity_name: ClassVar[str] = "entity/purchasereturn"
+
+    code: Optional[str] = None
+    store: Optional[Dict] = None
+    agent: Optional[Dict] = None
+    agentAccount: Optional[Dict] = None
+    contract: Optional[Dict] = None
+    payments: Optional[List[Dict]] = None
+    vatEnabled: Optional[bool] = None
+    vatIncluded: Optional[bool] = None
+    vatSum: Optional[Decimal] = None
+    organization: Optional[Dict] = None
+    organizationAccount: Optional[Dict] = None
+    positions: Optional[Dict] = None
+    supply: Optional[Dict] = None
+    payedSum: Optional[int] = None
+    factureIn: Optional[Dict] = None
+    factureOut: Optional[Dict] = None
+
+
+@dataclass
+class SalesReturn(BaseDocument):
+    """Sales Return entity in MoySklad."""
+    entity_name: ClassVar[str] = "entity/salesreturn"
+
+    store: Optional[Dict] = None
+    agent: Optional[Dict] = None
+    agentAccount: Optional[Dict] = None
+    contract: Optional[Dict] = None
+    payments: Optional[List[Dict]] = None
+    demand: Optional[List[Dict]] = None
+    losses: Optional[List[Dict]] = None
+    salesChannel: Optional[Dict] = None
+    vatEnabled: Optional[bool] = None
+    vatIncluded: Optional[bool] = None
+    vatSum: Optional[Decimal] = None
+    organization: Optional[Dict] = None
+    organizationAccount: Optional[Dict] = None
+    positions: Optional[Dict] = None
+    payedSum: Optional[int] = None
+    factureOut: Optional[Dict] = None
 
 @dataclass
 class InvoiceOut(BaseDocument):
@@ -262,6 +305,15 @@ class PaymentOut(BaseDocument):
 
 
 @dataclass
+class CounterpartyAdjustment(BaseDocument):
+    """Counterparty adjustment entity in MoySklad."""
+    entity_name: ClassVar[str] = "entity/counterpartyadjustment"
+
+    agent: Optional[Dict] = None
+    organization: Optional[Dict] = None
+
+
+@dataclass
 class RetailDemand(BaseDocument):
     """Retail Demand entity in MoySklad."""
     entity_name: ClassVar[str] = "entity/retaildemand"
@@ -276,3 +328,4 @@ class RetailDemand(BaseDocument):
     noCashSum: Optional[int] = None
     vatSum: Optional[int] = None
     fiscal: Optional[bool] = None
+

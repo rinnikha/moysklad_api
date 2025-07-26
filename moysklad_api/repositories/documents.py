@@ -9,13 +9,17 @@ from .base import EntityRepository
 from ..api_client import ApiClient
 from ..entities.documents import (
     CustomerOrder,
+    PurchaseReturn,
+    SalesReturn,
     InvoiceOut,
     Demand,
     Supply,
     CashIn,
     CashOut,
     PaymentIn,
-    PaymentOut, Position, PurchaseOrder
+    PaymentOut,
+    CounterpartyAdjustment,
+    Position, PurchaseOrder
 )
 from ..entities.base import Meta, ListEntity
 from ..query import QueryBuilder
@@ -239,6 +243,30 @@ class PurchaseOrderRepository(EntityRepository[PurchaseOrder]):
         """
         self.api_client.delete(f"{self.entity_name}/{order_id}/positions/{position_id}")
 
+class PurchaseReturnRepository(EntityRepository[PurchaseReturn]):
+    """Repository for PurchaseReturn entities."""
+
+    def __init__(self, api_client: ApiClient):
+        """
+        Initialize purchasereturn repository.
+        
+        Args:
+            api_client: API client instance
+        """
+        super().__init__(api_client, "entity/purchasereturn", PurchaseReturn)
+
+class SalesReturnRepository(EntityRepository[SalesReturn]):
+    """Repository for SalesReturn entities."""
+
+    def __init__(self, api_client: ApiClient):
+        """
+        Initialize salesreturn repository.
+
+        Args:
+            api_client: API client instance
+        """
+        super().__init__(api_client, "entity/salesreturn", SalesReturn)
+
 
 class InvoiceOutRepository(EntityRepository[InvoiceOut]):
     """Repository for InvoiceOut entities."""
@@ -377,3 +405,15 @@ class PaymentOutRepository(EntityRepository[PaymentOut]):
             api_client: API client instance
         """
         super().__init__(api_client, "entity/paymentout", PaymentOut)
+        
+class CounterpartyAdjustmentRepository(EntityRepository[Counterparty]):
+    """Repository for CounterpartyAdjustment entities."""
+
+    def __init__(self, api_client: ApiClient):
+        """
+        Initialize payment-out repository.
+        
+        Args:
+            api_client: API client instance
+        """
+        super().__init__(api_client, "entity/counterpartyadjustment", CounterpartyAdjustment)
