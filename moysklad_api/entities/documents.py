@@ -15,6 +15,7 @@ from ..constants import DocumentStatus
 @dataclass
 class Position(MetaEntity):
     """Document position entity in MoySklad."""
+
     quantity: Optional[int] = None
     price: Optional[Decimal] = None
     discount: Optional[Decimal] = None
@@ -37,21 +38,24 @@ class Position(MetaEntity):
         if isinstance(self.discount, (str, int, float)):
             self.discount = Decimal(str(self.discount))
 
+
 @dataclass
 class State(MetaEntity):
     """Document state entity in MoySklad."""
+
     color: Optional[Number] = None
     stateType: Optional[str] = None
     entityType: Optional[str] = None
 
     @staticmethod
     def get_href(entity_id: str, entity_type: str) -> str:
-        return f'https://api.moysklad.ru/api/remap/1.2/entity/{entity_type}/metadata/states/{entity_id}'
+        return f"https://api.moysklad.ru/api/remap/1.2/entity/{entity_type}/metadata/states/{entity_id}"
 
 
 @dataclass
 class BaseDocument(MetaEntity):
     """Base document entity in MoySklad."""
+
     owner: Optional[Dict] = None
     shared: Optional[bool] = None
     group: Optional[Dict] = None
@@ -77,6 +81,7 @@ class BaseDocument(MetaEntity):
 @dataclass
 class CustomerOrder(BaseDocument):
     """Customer Order entity in MoySklad."""
+
     entity_name: ClassVar[str] = "entity/customerorder"
 
     store: Optional[Dict] = None
@@ -98,13 +103,16 @@ class CustomerOrder(BaseDocument):
     positions: Optional[Dict] = None
     deliveryPlannedMoment: Optional[datetime] = None
     payedSum: Optional[int] = None
+    payments: Optional[List[Dict]] = None
     invoicesOut: Optional[List[Dict]] = None
     invoicedSum: Optional[int] = None
     reservedSum: Optional[int] = None
 
+
 @dataclass
 class PurchaseOrder(BaseDocument):
     """Customer Order entity in MoySklad."""
+
     entity_name: ClassVar[str] = "entity/customerorder"
 
     store: Optional[Dict] = None
@@ -136,6 +144,7 @@ class PurchaseOrder(BaseDocument):
 @dataclass
 class PurchaseReturn(BaseDocument):
     """Purchase Return entity in MoySklad."""
+
     entity_name: ClassVar[str] = "entity/purchasereturn"
 
     code: Optional[str] = None
@@ -159,6 +168,7 @@ class PurchaseReturn(BaseDocument):
 @dataclass
 class SalesReturn(BaseDocument):
     """Sales Return entity in MoySklad."""
+
     entity_name: ClassVar[str] = "entity/salesreturn"
 
     store: Optional[Dict] = None
@@ -178,9 +188,11 @@ class SalesReturn(BaseDocument):
     payedSum: Optional[int] = None
     factureOut: Optional[Dict] = None
 
+
 @dataclass
 class InvoiceOut(BaseDocument):
     """Invoice entity in MoySklad."""
+
     entity_name: ClassVar[str] = "entity/invoiceout"
 
     agent: Optional[Dict] = None
@@ -205,6 +217,7 @@ class InvoiceOut(BaseDocument):
 @dataclass
 class Demand(BaseDocument):
     """Demand entity in MoySklad."""
+
     entity_name: ClassVar[str] = "entity/demand"
 
     agent: Optional[Dict] = None
@@ -223,6 +236,7 @@ class Demand(BaseDocument):
 @dataclass
 class Supply(BaseDocument):
     """Supply entity in MoySklad."""
+
     entity_name: ClassVar[str] = "entity/supply"
 
     agent: Optional[Dict] = None
@@ -240,6 +254,7 @@ class Supply(BaseDocument):
 @dataclass
 class CashIn(BaseDocument):
     """Cash In entity in MoySklad."""
+
     entity_name: ClassVar[str] = "entity/cashin"
 
     agent: Optional[Dict] = None
@@ -255,6 +270,7 @@ class CashIn(BaseDocument):
 @dataclass
 class CashOut(BaseDocument):
     """Cash Out entity in MoySklad."""
+
     entity_name: ClassVar[str] = "entity/cashout"
 
     agent: Optional[Dict] = None
@@ -271,6 +287,7 @@ class CashOut(BaseDocument):
 @dataclass
 class PaymentIn(BaseDocument):
     """Payment In entity in MoySklad."""
+
     entity_name: ClassVar[str] = "entity/paymentin"
 
     agent: Optional[Dict] = None
@@ -290,6 +307,7 @@ class PaymentIn(BaseDocument):
 @dataclass
 class PaymentOut(BaseDocument):
     """Payment Out entity in MoySklad."""
+
     entity_name: ClassVar[str] = "entity/paymentout"
 
     agent: Optional[Dict] = None
@@ -307,6 +325,7 @@ class PaymentOut(BaseDocument):
 @dataclass
 class CounterpartyAdjustment(BaseDocument):
     """Counterparty adjustment entity in MoySklad."""
+
     entity_name: ClassVar[str] = "entity/counterpartyadjustment"
 
     agent: Optional[Dict] = None
@@ -316,6 +335,7 @@ class CounterpartyAdjustment(BaseDocument):
 @dataclass
 class RetailDemand(BaseDocument):
     """Retail Demand entity in MoySklad."""
+
     entity_name: ClassVar[str] = "entity/retaildemand"
 
     agent: Optional[Dict] = None
@@ -328,4 +348,3 @@ class RetailDemand(BaseDocument):
     noCashSum: Optional[int] = None
     vatSum: Optional[int] = None
     fiscal: Optional[bool] = None
-
