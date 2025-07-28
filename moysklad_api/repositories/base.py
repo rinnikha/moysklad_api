@@ -42,9 +42,34 @@ class EntityRepository(Generic[T]):
         params = query_builder.to_params() if query_builder else {}
         response = self.api_client.get(self.entity_name, params=params)
 
-        list_entity = ListEntity.from_dict(response, self.entity_class)
+        data = ListEntity.from_dict(response, self.entity_class)
 
-        return list_entity.rows, list_entity.meta
+        return data.rows, data.meta
+    
+    def fetch_all(self, query_builder: Optional[QueryBuilder] = None) -> List[T]:
+        """
+        Fetches all entities matching the query from all pages.
+        
+        Args:
+            query_builder: Query builer for filtering, sorting, etc.
+        Returns:
+            List of entities.
+        """
+        params = query_builder.to_params() if query_builder else {}
+        response = self.api_client.get(self.entity_name, params=params)
+        data = ListEntity.from_dict(response, self.entity_class)
+
+        list_entities: List[T]  = data.rows
+
+        while (data.meta.nextHref):
+            response = self.api_client.get_via_url(data.meta.nextHref)
+            data = ListEntity.from_dict(response, self.entity_class)
+
+            if len(data.rows) > 0:
+                list_entities.append(data.rows)
+            
+        return list_entities
+
 
     def find_by_id(self, entity_id: str, query_builder: Optional[QueryBuilder] = None) -> T:
         """

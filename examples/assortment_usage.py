@@ -30,8 +30,7 @@ print("Fetching assortment items...")
 query = client.assortment.query()
 query.filter().eq("archived", False)
 
-query.limit(10)
-
+items_form_all_pages = client.assortment.fetch_all(query)
 items, meta = client.assortment.find_all(query)
 print(f"Found {meta.size} total items, showing first {len(items)}")
 

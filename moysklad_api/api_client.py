@@ -145,6 +145,48 @@ class ApiClient:
                 self.logger.warning(f"Connection error: {str(e)}. Retrying in {wait_time} seconds.")
                 time.sleep(wait_time)
 
+    def _make_request_by_url(self, method: str, url: str, **kwargs) -> Dict:
+        """
+        Make a request to specific url with retry logic.
+
+        Args:
+            method: HTTP method (GET, POST, PUT, DELETE)
+            url: API url
+            **kwargs: Additional parameters to pass to requests
+
+        Returns:
+            Parsed JSON response
+
+        Raises:
+            MoySkladException: When all retries fail
+        """
+        self.logger.debug(f"Making {method} request to {url}")
+        if "json" in kwargs and self.config.debug:
+            self.logger.debug(f"Request body: {kwargs['json']}")
+        if "params" in kwargs and self.config.debug:
+            self.logger.debug(f"Request params: {kwargs['params']}")
+
+        kwargs["timeout"] = kwargs.get("timeout", self.config.timeout)
+
+        for attempt in range(self.config.retry_count):
+            try:
+                response = self.session.request(method, url, **kwargs)
+                return self._handle_response(response)
+            except RateLimitException as e:
+                if attempt == self.config.retry_count - 1:
+                    raise
+
+                wait_time = e.retry_after or self.config.retry_delay
+                self.logger.warning(f"Rate limit exceeded. Waiting {wait_time} seconds before retry.")
+                time.sleep(wait_time)
+            except (requests.ConnectionError, requests.Timeout) as e:
+                if attempt == self.config.retry_count - 1:
+                    raise MoySkladException(0, str(e))
+
+                wait_time = self.config.retry_delay * (2 ** attempt)  # Exponential backoff
+                self.logger.warning(f"Connection error: {str(e)}. Retrying in {wait_time} seconds.")
+                time.sleep(wait_time)
+
     def get(self, endpoint: str, params: Optional[Dict] = None) -> Dict:
         """
         Make a GET request to the MoySklad API.
@@ -157,6 +199,18 @@ class ApiClient:
             Parsed JSON response
         """
         return self._make_request("GET", endpoint, params=params)
+    
+    def get_via_url(self, url: str) -> Dict:
+        """
+        Make a GET request to specific url.
+        
+        Args:
+            url: API url path
+        
+        Returns:
+            Parsed JSON response
+        """
+        return self._make_request_by_url("GET", url)
 
     def post(self, endpoint: str, data: Optional[Dict] = None, params: Optional[Dict] = None) -> Dict:
         """
