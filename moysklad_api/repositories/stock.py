@@ -20,17 +20,18 @@ class StockReportRepository:
         """
         self.api_client = api_client
 
-    def get_stock_report(self, store_href) -> List[StockFromReport]:
+    def get_stock_report(self, store_href: str, type: str) -> List[StockFromReport]:
         """
         Get stock info for a store.
 
         Args:
             store_href: Store href for filtering
+            type: type of products "all", "positiveOnly", "negativeOnly", "empty", "nonEmpty", "underMinimum"
 
         Returns:
             List of Stock entities
         """
 
-        response = self.api_client.get(f"report/stock/all?filter=store={store_href}")
+        response = self.api_client.get(f"report/stock/{type}?filter=store={store_href}")
         rows = response.get("rows", [])
         return [StockFromReport.from_dict(row) for row in rows]
