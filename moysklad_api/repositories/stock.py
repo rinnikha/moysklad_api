@@ -1,11 +1,11 @@
 """
-Product-related repositories for the MoySklad API.
+Stock-related repositories for the MoySklad API.
 """
 
 from typing import List
 
 from ..api_client import ApiClient
-from ..entities.stock import StockFromReport
+from ..entities.stock import StockFromReport, StockFromWebhookReport
 
 
 class StockReportRepository:
@@ -19,6 +19,14 @@ class StockReportRepository:
             api_client: API client instance
         """
         self.api_client = api_client
+
+    def get_stock_from_webhook_report(
+        self, report_href
+    ) -> List[StockFromWebhookReport]:
+        """ """
+
+        response = self.api_client.get_via_url(report_href)
+        return [StockFromWebhookReport.from_dict(row) for row in response]
 
     def get_stock_report(self, store_href: str, type: str) -> List[StockFromReport]:
         """

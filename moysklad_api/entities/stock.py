@@ -54,6 +54,31 @@ class Stock:
 
 
 @dataclass
+class StockFromWebhookReport:
+    """Stock from webhook report in MoySklad."""
+
+    assortmentId: Optional[str] = None
+    storeId: Optional[str] = None
+    stock: Optional[float] = None
+
+    @classmethod
+    def from_dict(cls, data: Dict) -> "Stock":
+        """
+        Create stock entity from API response.
+
+        Args:
+            data: Dictionary data from API
+
+        Returns:
+            A new Stock instance
+        """
+        if not data:
+            return None
+
+        return cls(**data)
+
+
+@dataclass
 class StockFromReport:
     """Stock from report in MoySklad."""
 
