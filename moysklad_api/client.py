@@ -5,6 +5,7 @@ Main client class for the MoySklad API.
 from typing import Dict, Any, Optional, Type, List
 
 from moysklad_api.repositories.stock import StockReportRepository
+from moysklad_api.repositories.webhook import WebhookRepository, WebhookStockRepository
 
 from .api_client import ApiClient
 from .config import MoySkladConfig
@@ -94,6 +95,9 @@ class MoySklad:
         self.cash_outs = CashOutRepository(self.api_client)
         self.payment_ins = PaymentInRepository(self.api_client)
         self.payment_outs = PaymentOutRepository(self.api_client)
+
+        self.webhooks = WebhookRepository(self.api_client)
+        self.webhook_stock = WebhookStockRepository(self.api_client)
 
         self.stock_report = StockReportRepository(self.api_client)
 
