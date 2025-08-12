@@ -2,13 +2,10 @@
 Product-related repositories for the MoySklad API.
 """
 
-from typing import Dict, List, Any, Optional, Tuple
+from typing import List
 
-from .base import EntityRepository
 from ..api_client import ApiClient
-from ..entities.stock import Stock
-from ..entities.base import Meta, ListEntity
-from ..query import QueryBuilder
+from ..entities.stock import StockFromReport
 
 
 class StockReportRepository:
@@ -23,7 +20,7 @@ class StockReportRepository:
         """
         self.api_client = api_client
 
-    def get_stock_report(self, store_href) -> List[Stock]:
+    def get_stock_report(self, store_href) -> List[StockFromReport]:
         """
         Get stock info for a store.
 
@@ -36,4 +33,4 @@ class StockReportRepository:
 
         response = self.api_client.get(f"report/stock/all?filter=store={store_href}")
         rows = response.get("rows", [])
-        return [Stock.from_dict(row) for row in rows]
+        return [StockFromReport.from_dict(row) for row in rows]

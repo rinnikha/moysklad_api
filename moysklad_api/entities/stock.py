@@ -54,6 +54,56 @@ class Stock:
 
 
 @dataclass
+class StockFromReport:
+    """Stock from report in MoySklad."""
+
+    meta: Optional[Meta] = None
+    code: Optional[str] = None
+    reserve: Optional[Decimal] = None
+    inTransit: Optional[Decimal] = None
+    quantity: Optional[Decimal] = None
+    name: Optional[str] = None
+    code: Optional[str] = None
+    article: Optional[str] = None
+    externalCode: Optional[str] = None
+    image: Optional[Meta] = None
+    assortment: Optional[Dict] = None
+    folder: Optional[Dict] = None
+    price: Optional[float] = None
+    salePrice: Optional[float] = None
+    stock: Optional[float] = None
+    stockDays: Optional[int] = None
+    uom: Optional[Dict] = None
+
+    def __post_init__(self):
+        """Post-initialization hook."""
+        if isinstance(self.meta, dict):
+            self.meta = Meta(**self.meta)
+
+        # Convert string to Decimal if needed
+        for attr in ["stock", "reserve", "inTransit", "quantity"]:
+            value = getattr(self, attr)
+            if value is not None and not isinstance(value, Decimal):
+                setattr(self, attr, Decimal(str(value)))
+
+    @classmethod
+    def from_dict(cls, data: Dict) -> "Stock":
+        """
+        Create stock entity from API response.
+
+        Args:
+            data: Dictionary data from API
+
+        Returns:
+            A new Stock instance
+        """
+        if not data:
+            return None
+
+        return cls(**data)
+
+
+@dataclass
 class StockByOperation:
     """Stock by operation entity in MoySklad."""
 
