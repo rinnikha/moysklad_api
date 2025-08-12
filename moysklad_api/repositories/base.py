@@ -10,7 +10,7 @@ from ..query import QueryBuilder
 from ..entities.base import MetaEntity, Meta, ListEntity
 
 
-T = TypeVar('T', bound=MetaEntity)
+T = TypeVar("T", bound=MetaEntity)
 
 
 class EntityRepository(Generic[T]):
@@ -29,7 +29,9 @@ class EntityRepository(Generic[T]):
         self.entity_name = entity_name
         self.entity_class = entity_class
 
-    def find_all(self, query_builder: Optional[QueryBuilder] = None) -> Tuple[List[T], Meta]:
+    def find_all(
+        self, query_builder: Optional[QueryBuilder] = None
+    ) -> Tuple[List[T], Meta]:
         """
         Find all entities matching the query.
 
@@ -45,11 +47,11 @@ class EntityRepository(Generic[T]):
         data = ListEntity.from_dict(response, self.entity_class)
 
         return data.rows, data.meta
-    
+
     def fetch_all(self, query_builder: Optional[QueryBuilder] = None) -> List[T]:
         """
         Fetches all entities matching the query from all pages.
-        
+
         Args:
             query_builder: Query builer for filtering, sorting, etc.
         Returns:
@@ -59,19 +61,20 @@ class EntityRepository(Generic[T]):
         response = self.api_client.get(self.entity_name, params=params)
         data = ListEntity.from_dict(response, self.entity_class)
 
-        list_entities: List[T]  = data.rows
+        list_entities: List[T] = data.rows
 
-        while (data.meta.nextHref):
+        while data.meta.nextHref:
             response = self.api_client.get_via_url(data.meta.nextHref)
             data = ListEntity.from_dict(response, self.entity_class)
 
             if len(data.rows) > 0:
-                list_entities.append(data.rows)
-            
+                list_entities.extend(data.rows)
+
         return list_entities
 
-
-    def find_by_id(self, entity_id: str, query_builder: Optional[QueryBuilder] = None) -> T:
+    def find_by_id(
+        self, entity_id: str, query_builder: Optional[QueryBuilder] = None
+    ) -> T:
         """
         Find an entity by ID.
 
@@ -174,9 +177,7 @@ class EntityRepository(Generic[T]):
         data = [entity.to_dict() for entity in entities]
         response = self.api_client.post(self.entity_name, data=data)
 
-        if "rows" in response:
-            return [self.entity_class.from_dict(row) for row in response.get("rows", [])]
-        return [self.entity_class.from_dict(response)]
+        return [self.entity_class.from_dict(row) for row in response]
 
     def update_bulk(self, entities: List[T]) -> List[T]:
         """
@@ -193,13 +194,17 @@ class EntityRepository(Generic[T]):
         """
         for entity in entities:
             if not entity.id:
-                raise ValueError("All entities must have an ID for bulk update operation")
+                raise ValueError(
+                    "All entities must have an ID for bulk update operation"
+                )
 
         data = [entity.to_dict() for entity in entities]
         response = self.api_client.post(self.entity_name, data=data)
 
         if "rows" in response:
-            return [self.entity_class.from_dict(row) for row in response.get("rows", [])]
+            return [
+                self.entity_class.from_dict(row) for row in response.get("rows", [])
+            ]
         return [self.entity_class.from_dict(response)]
 
     def delete_bulk(self, entity_ids: List[str]) -> None:

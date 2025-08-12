@@ -13,8 +13,8 @@ from ..constants import CompanyType
 @dataclass
 class ContactPerson(MetaEntity):
     """Contact person entity in MoySklad."""
-    entity_name: ClassVar[str] = "entity/counterparty/contactperson"
 
+    entity_name: ClassVar[str] = "entity/counterparty/contactperson"
 
     description: Optional[str] = None
     externalCode: Optional[str] = None
@@ -24,10 +24,10 @@ class ContactPerson(MetaEntity):
     agent: Optional[Dict] = None
 
 
-
 @dataclass
 class BankAccount(MetaEntity):
     """Bank account entity in MoySklad."""
+
     entity_name: ClassVar[str] = "entity/counterparty/account"
 
     description: Optional[str] = None
@@ -43,6 +43,7 @@ class BankAccount(MetaEntity):
 @dataclass
 class Counterparty(MetaEntity):
     """Counterparty entity in MoySklad."""
+
     entity_name: ClassVar[str] = "entity/counterparty"
 
     code: Optional[str] = None
@@ -91,7 +92,7 @@ class Counterparty(MetaEntity):
 
     @staticmethod
     def get_href(entity_id: str) -> str:
-        return f'https://api.moysklad.ru/api/remap/1.2/entity/counterparty/{entity_id}'
+        return f"https://api.moysklad.ru/api/remap/1.2/entity/counterparty/{entity_id}"
 
     def __post_init__(self):
         """Post-initialization hook."""

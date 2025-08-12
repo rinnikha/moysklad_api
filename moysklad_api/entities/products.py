@@ -14,6 +14,7 @@ from ..constants import PaymentItemType, TrackingType
 @dataclass
 class Barcode(MetaEntity):
     """Barcode entity in MoySklad."""
+
     ean13: Optional[str] = None
     ean8: Optional[str] = None
     code128: Optional[str] = None
@@ -24,6 +25,7 @@ class Barcode(MetaEntity):
 @dataclass
 class Price:
     """Price entity in MoySklad."""
+
     value: Decimal
     currency: Dict
     priceType: Optional[Dict] = None
@@ -37,6 +39,7 @@ class Price:
 @dataclass
 class Image(MetaEntity):
     """Image entity in MoySklad."""
+
     filename: Optional[str] = None
     miniature: Optional[Dict] = None
     tiny: Optional[Dict] = None
@@ -46,6 +49,7 @@ class Image(MetaEntity):
 @dataclass
 class ProductFolder(MetaEntity):
     """Product folder entity in MoySklad."""
+
     entity_name: ClassVar[str] = "entity/productfolder"
 
     pathName: Optional[str] = None
@@ -53,20 +57,25 @@ class ProductFolder(MetaEntity):
     externalCode: Optional[str] = None
     archived: Optional[bool] = None
     vat: Optional[int] = None
+    vatEnabled: Optional[bool] = None
     effectiveVat: Optional[int] = None
+    effectiveVatEnabled: Optional[bool] = None
     useParentVat: Optional[bool] = None
     taxSystem: Optional[str] = None
     shared: Optional[bool] = None
     owner: Optional[Dict] = None
     group: Optional[Dict] = None
     productFolder: Optional[Dict] = None
+    description: Optional[str] = None
 
     created: Optional[datetime] = None
     updated: Optional[datetime] = None
 
+
 @dataclass
 class Currency(MetaEntity):
     """Currency entity in MoySklad."""
+
     entity_name: ClassVar[str] = "entity/currency"
 
     code: Optional[str] = None
@@ -83,10 +92,12 @@ class Currency(MetaEntity):
     system: Optional[bool] = None
     archived: Optional[bool] = None
 
+
 @dataclass
 class PriceType(MetaEntity):
     """Price type entity in MoySklad."""
-    entity_name: ClassVar[str] ="context/companysettings/pricetype"
+
+    entity_name: ClassVar[str] = "context/companysettings/pricetype"
 
     externalCode: Optional[str] = None
 
@@ -94,6 +105,7 @@ class PriceType(MetaEntity):
 @dataclass
 class Uom(MetaEntity):
     """Unit of measurement entity in MoySklad."""
+
     entity_name: ClassVar[str] = "entity/uom"
 
     code: Optional[str] = None
@@ -107,6 +119,7 @@ class Uom(MetaEntity):
 @dataclass
 class Product(MetaEntity):
     """Product entity in MoySklad."""
+
     entity_name: ClassVar[str] = "entity/product"
 
     code: Optional[str] = None
@@ -170,6 +183,7 @@ class Product(MetaEntity):
 @dataclass
 class Variant(MetaEntity):
     """Product variant entity in MoySklad."""
+
     entity_name: ClassVar[str] = "entity/variant"
 
     code: Optional[str] = None

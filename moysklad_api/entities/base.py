@@ -26,10 +26,10 @@ def _convert_for_json(obj):
     return obj
 
 
-
 @dataclass
 class Meta:
     """Represents MoySklad entity metadata."""
+
     href: str
     metadataHref: Optional[str] = None
     type: Optional[str] = None
@@ -43,7 +43,7 @@ class Meta:
     offset: Optional[int] = None
 
     @classmethod
-    def create_default(cls, href: str = "") -> 'Meta':
+    def create_default(cls, href: str = "") -> "Meta":
         """
         Create a default Meta object with minimal required fields.
 
@@ -55,10 +55,27 @@ class Meta:
         """
         return cls(href=href)
 
+    @classmethod
+    def from_dict(cls, data: Dict) -> "Meta":
+        """
+        Create an entity from a dictionary.
+
+        Args:
+            data: Dictionary data from API
+
+        Returns:
+            A new entity instance
+        """
+
+        if not data:
+            return None
+        return cls(**data)
+
 
 @dataclass
 class MetaEntity:
     """Base class for all MoySklad entities with metadata."""
+
     meta: Optional[Meta] = None
     id: Optional[str] = None
     accountId: Optional[str] = None
@@ -69,7 +86,6 @@ class MetaEntity:
 
     # Class variable to store entity type name
     entity_name: ClassVar[str] = ""
-
 
     def __post_init__(self):
         """
@@ -92,9 +108,8 @@ class MetaEntity:
         # Convert special types (Decimal, datetime) for JSON serialization
         return _convert_for_json(data)
 
-
     @classmethod
-    def from_dict(cls, data: Dict) -> 'MetaEntity':
+    def from_dict(cls, data: Dict) -> "MetaEntity":
         """
         Create an entity from a dictionary.
 
@@ -110,12 +125,13 @@ class MetaEntity:
         return cls(**data)
 
 
-T = TypeVar('T', bound=MetaEntity)
+T = TypeVar("T", bound=MetaEntity)
 
 
 @dataclass
 class ListEntity(Generic[T]):
     """Represents a list of entities from the MoySklad API."""
+
     meta: Meta
     rows: List[T]
     context: Optional[Dict] = None
@@ -129,7 +145,7 @@ class ListEntity(Generic[T]):
             self.meta = Meta(**self.meta)
 
     @classmethod
-    def from_dict(cls, data: Dict, entity_class: Type[T]) -> 'ListEntity[T]':
+    def from_dict(cls, data: Dict, entity_class: Type[T]) -> "ListEntity[T]":
         """
         Create a list entity from API response.
 
@@ -147,7 +163,5 @@ class ListEntity(Generic[T]):
         rows = [entity_class.from_dict(row) for row in data.get("rows", [])]
 
         return cls(
-            meta=Meta(**data.get("meta", {})),
-            rows=rows,
-            context=data.get("context")
+            meta=Meta(**data.get("meta", {})), rows=rows, context=data.get("context")
         )

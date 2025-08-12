@@ -221,16 +221,27 @@ class Demand(BaseDocument):
     entity_name: ClassVar[str] = "entity/demand"
 
     agent: Optional[Dict] = None
+    agentAccount: Optional[Dict] = None
+    code: Optional[str] = None
+    contract: Optional[Dict] = None
+    customerOrder: Optional[Dict] = None
+    factureOut: Optional[Dict] = None
+    returns: Optional[Dict] = None
     organization: Optional[Dict] = None
     organizationAccount: Optional[Dict] = None
-    agentAccount: Optional[Dict] = None
+    overhead: Optional[Dict] = None
+    salesChannel: Optional[Dict] = None
     store: Optional[Dict] = None
     positions: Optional[Dict] = None
     customerOrder: Optional[Dict] = None
     invoicesOut: Optional[List[Dict]] = None
     payedSum: Optional[int] = None
+    payments: Optional[Dict] = None
     shipmentAddress: Optional[str] = None
     shipmentAddressFull: Optional[Dict] = None
+    vatEnabled: Optional[bool] = None
+    vatIncluded: Optional[bool] = None
+    vatSum: Optional[float] = None
 
 
 @dataclass
@@ -258,13 +269,14 @@ class CashIn(BaseDocument):
     entity_name: ClassVar[str] = "entity/cashin"
 
     agent: Optional[Dict] = None
+    code: Optional[str] = None
     organization: Optional[Dict] = None
     contract: Optional[Dict] = None
     paymentPurpose: Optional[str] = None
+    salesChannel: Optional[Dict] = None
     operations: Optional[List[Dict]] = None
     factureIn: Optional[Dict] = None
     vatSum: Optional[int] = None
-    retailShift: Optional[Dict] = None
 
 
 @dataclass
@@ -348,3 +360,30 @@ class RetailDemand(BaseDocument):
     noCashSum: Optional[int] = None
     vatSum: Optional[int] = None
     fiscal: Optional[bool] = None
+
+
+@dataclass
+class Enter(BaseDocument):
+    """Product Entere to store in MoySklad."""
+
+    entity_name: ClassVar[str] = "entity/enter"
+
+    organization: Optional[Dict] = None
+    overhead: Optional[Dict] = None
+    positions: Optional[Dict] = None
+    store: Optional[Dict] = None
+    inventory: Optional[Dict] = None
+
+
+@dataclass
+class Loss(BaseDocument):
+    """Product loss from store in MoySklad"""
+
+    entity_name: ClassVar[str] = "entity/loss"
+
+    organization: Optional[Dict] = None
+    overhead: Optional[Dict] = None
+    positions: Optional[Dict] = None
+    store: Optional[Dict] = None
+    salesReturn: Optional[Dict] = None
+    inventory: Optional[Dict] = None

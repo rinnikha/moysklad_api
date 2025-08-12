@@ -12,6 +12,7 @@ from .base import Meta, MetaEntity
 @dataclass
 class Stock:
     """Stock entity in MoySklad."""
+
     meta: Optional[Meta] = None
     stock: Optional[Decimal] = None
     reserve: Optional[Decimal] = None
@@ -30,13 +31,13 @@ class Stock:
             self.meta = Meta(**self.meta)
 
         # Convert string to Decimal if needed
-        for attr in ['stock', 'reserve', 'inTransit', 'quantity']:
+        for attr in ["stock", "reserve", "inTransit", "quantity"]:
             value = getattr(self, attr)
             if value is not None and not isinstance(value, Decimal):
                 setattr(self, attr, Decimal(str(value)))
 
     @classmethod
-    def from_dict(cls, data: Dict) -> 'Stock':
+    def from_dict(cls, data: Dict) -> "Stock":
         """
         Create stock entity from API response.
 
@@ -55,6 +56,7 @@ class Stock:
 @dataclass
 class StockByOperation:
     """Stock by operation entity in MoySklad."""
+
     meta: Optional[Meta] = None
     stock: Optional[Decimal] = None
     operation: Optional[Dict] = None
@@ -70,7 +72,7 @@ class StockByOperation:
             self.stock = Decimal(str(self.stock))
 
     @classmethod
-    def from_dict(cls, data: Dict) -> 'StockByOperation':
+    def from_dict(cls, data: Dict) -> "StockByOperation":
         """
         Create stock by operation entity from API response.
 
@@ -89,6 +91,7 @@ class StockByOperation:
 @dataclass
 class StockByStore:
     """Stock by store entity in MoySklad."""
+
     meta: Optional[Meta] = None
     stock: Optional[Decimal] = None
     reserve: Optional[Decimal] = None
@@ -102,13 +105,13 @@ class StockByStore:
             self.meta = Meta(**self.meta)
 
         # Convert string to Decimal if needed
-        for attr in ['stock', 'reserve', 'inTransit']:
+        for attr in ["stock", "reserve", "inTransit"]:
             value = getattr(self, attr)
             if value is not None and not isinstance(value, Decimal):
                 setattr(self, attr, Decimal(str(value)))
 
     @classmethod
-    def from_dict(cls, data: Dict) -> 'StockByStore':
+    def from_dict(cls, data: Dict) -> "StockByStore":
         """
         Create stock by store entity from API response.
 

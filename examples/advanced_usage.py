@@ -3,7 +3,12 @@ Advanced usage example for the MoySklad API client.
 """
 
 from moysklad_api import MoySklad
-from moysklad_api.entities.documents import CustomerOrder, Position, InvoiceOut, PaymentIn
+from moysklad_api.entities.documents import (
+    CustomerOrder,
+    Position,
+    InvoiceOut,
+    PaymentIn,
+)
 from moysklad_api.entities.base import Meta
 from moysklad_api.entities.counterparty import Counterparty, ContactPerson
 from moysklad_api.entities.products import Product
@@ -21,6 +26,9 @@ client = MoySklad(
     debug=True,
 )
 
+
+client.product_folders.create_bulk()
+
 # Create new counterparty
 default_price_type = client.price_types.get_default()
 
@@ -29,7 +37,7 @@ new_counterparty = Counterparty(
     name="New Counterparty1",
     description="New Counterparty1 description",
     phone="+123456442",
-    priceType=default_price_type
+    priceType=default_price_type,
 )
 
 
@@ -47,9 +55,11 @@ else:
         # meta=Meta.create_default(),
         name="John Doe",
         email="john@example.com",
-        phone="+7 999 123-45-67"
+        phone="+7 999 123-45-67",
     )
-    contact_person = client.counterparties.add_contact_person(counterparty.id, new_contact)
+    contact_person = client.counterparties.add_contact_person(
+        counterparty.id, new_contact
+    )
     print(f"Created new contact person: {contact_person.name}")
 
 # Find products to add to order
@@ -84,15 +94,9 @@ store = stores[0]
 new_order = CustomerOrder(
     # meta=Meta.create_default(),
     # name="Order from API",
-    organization={
-        "meta": organization.meta
-    },
-    agent={
-        "meta": counterparty.meta
-    },
-    store={
-        "meta": store.meta
-    }
+    organization={"meta": organization.meta},
+    agent={"meta": counterparty.meta},
+    store={"meta": store.meta},
 )
 
 created_order = client.customer_orders.create(new_order)
@@ -101,14 +105,12 @@ print(f"Created order: {created_order.name} (ID: {created_order.id})")
 # Add positions to the order
 for i, product in enumerate(products):
     new_position = Position(
-        assortment={ "meta": product.meta},
-        discount=0,
-        quantity=2,
-        vat=20,
-        price=100
+        assortment={"meta": product.meta}, discount=0, quantity=2, vat=20, price=100
     )
 
-    created_position = client.customer_orders.create_position(created_order.id, new_position)
+    created_position = client.customer_orders.create_position(
+        created_order.id, new_position
+    )
     print(f"Added position: {product.name} (Quantity: 1)")
 
 # Reload the order to see positions
@@ -118,16 +120,10 @@ positions, _ = client.customer_orders.get_positions(created_order.id)
 print(f"Order now has {len(positions)} positions")
 
 new_invoice = InvoiceOut(
-    organization={
-        "meta": organization.meta
-    },
-    agent={
-        "meta": counterparty.meta
-    },
-    customerOrder={
-        "meta": created_order.meta
-    },
-    sum=created_order.sum
+    organization={"meta": organization.meta},
+    agent={"meta": counterparty.meta},
+    customerOrder={"meta": created_order.meta},
+    sum=created_order.sum,
 )
 
 created_invoice = client.invoiceouts.create(new_invoice)
@@ -144,19 +140,10 @@ print(f"Order has {len(order_invoices)} invoices")
 
 # Create a payment for the invoice
 new_payment = PaymentIn(
-    organization={
-        "meta": organization.meta
-    },
-    agent={
-        "meta": counterparty.meta
-    },
-    operations=[
-        {
-            "meta": created_invoice.meta,
-            "linked_sum": created_invoice.sum
-        }
-    ],
-    sum=sum(float(p.price) * float(p.quantity) for p in positions)
+    organization={"meta": organization.meta},
+    agent={"meta": counterparty.meta},
+    operations=[{"meta": created_invoice.meta, "linked_sum": created_invoice.sum}],
+    sum=sum(float(p.price) * float(p.quantity) for p in positions),
 )
 
 created_payment = client.payment_ins.create(new_payment)

@@ -46,7 +46,9 @@ class OrganizationRepository(EntityRepository[Organization]):
         Returns:
             Created account data
         """
-        return self.api_client.post(f"{self.entity_name}/{organization_id}/accounts", data=account_data)
+        return self.api_client.post(
+            f"{self.entity_name}/{organization_id}/accounts", data=account_data
+        )
 
 
 class EmployeeRepository(EntityRepository[Employee]):
@@ -84,7 +86,9 @@ class StoreRepository(EntityRepository[Store]):
         """
         super().__init__(api_client, "entity/store", Store)
 
-    def get_stock(self, store_id: str, query_builder: Optional[QueryBuilder] = None) -> Dict:
+    def get_stock(
+        self, store_id: str, query_builder: Optional[QueryBuilder] = None
+    ) -> Dict:
         """
         Get stock for a store.
 
@@ -96,4 +100,19 @@ class StoreRepository(EntityRepository[Store]):
             Stock data
         """
         params = query_builder.to_params() if query_builder else {}
-        return self.api_client.get(f"{self.entity_name}/{store_id}/stock", params=params)
+        return self.api_client.get(
+            f"{self.entity_name}/{store_id}/stock", params=params
+        )
+
+
+class GroupRepository(EntityRepository[Group]):
+    """Repository for Group entities."""
+
+    def __init__(self, api_client: ApiClient):
+        """
+        Initialize group repository.
+
+        Args:
+            api_client: API client instance
+        """
+        super().__init__(api_client, "entity/group", Group)

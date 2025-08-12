@@ -6,7 +6,14 @@ from typing import Dict, List, Any, Optional, Tuple
 
 from .base import EntityRepository
 from ..api_client import ApiClient
-from ..entities.products import Product, ProductFolder, Variant, Uom, PriceType, Currency
+from ..entities.products import (
+    Product,
+    ProductFolder,
+    Variant,
+    Uom,
+    PriceType,
+    Currency,
+)
 from ..entities.base import Meta, ListEntity
 from ..query import QueryBuilder
 
@@ -34,7 +41,7 @@ class ProductRepository(EntityRepository[Product]):
             Stock information
         """
         return self.api_client.get(f"{self.entity_name}/{product_id}/stock")
-    
+
     def get_by_sku(self, sku: str) -> Product:
         """
         Find product by sku.
@@ -95,7 +102,9 @@ class ProductFolderRepository(EntityRepository[ProductFolder]):
         """
         super().__init__(api_client, "entity/productfolder", ProductFolder)
 
-    def get_products(self, folder_id: str, query_builder: Optional[QueryBuilder] = None) -> Tuple[List[Product], Meta]:
+    def get_products(
+        self, folder_id: str, query_builder: Optional[QueryBuilder] = None
+    ) -> Tuple[List[Product], Meta]:
         """
         Get products in a folder.
 
@@ -155,6 +164,7 @@ class UomRepository(EntityRepository[Uom]):
         """
         super().__init__(api_client, "entity/uom", Uom)
 
+
 class CurrencyRepository(EntityRepository[Currency]):
     """Repository for Currency entities."""
 
@@ -196,4 +206,3 @@ class PriceTypeRepository(EntityRepository[PriceType]):
         entity = PriceType.from_dict(response)
 
         return entity
-

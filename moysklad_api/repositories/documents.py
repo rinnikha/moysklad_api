@@ -1,6 +1,7 @@
 """
 Document-related repositories for the MoySklad API.
 """
+
 from http.client import responses
 from typing import Dict, List, Any, Optional, Tuple
 
@@ -9,6 +10,8 @@ from .base import EntityRepository
 from ..api_client import ApiClient
 from ..entities.documents import (
     CustomerOrder,
+    Enter,
+    Loss,
     PurchaseReturn,
     SalesReturn,
     InvoiceOut,
@@ -19,7 +22,8 @@ from ..entities.documents import (
     PaymentIn,
     PaymentOut,
     CounterpartyAdjustment,
-    Position, PurchaseOrder
+    Position,
+    PurchaseOrder,
 )
 from ..entities.base import Meta, ListEntity
 from ..query import QueryBuilder
@@ -46,8 +50,9 @@ class CustomerOrderRepository(EntityRepository[CustomerOrder]):
         """
         return self.api_client.get(f"{self.entity_name}/metadata")
 
-    def get_by_agent(self, agent_id: str, query_builder: Optional[QueryBuilder] = None) -> Tuple[
-        List[CustomerOrder], Meta]:
+    def get_by_agent(
+        self, agent_id: str, query_builder: Optional[QueryBuilder] = None
+    ) -> Tuple[List[CustomerOrder], Meta]:
         """
         Get orders by agent (counterparty).
 
@@ -63,7 +68,9 @@ class CustomerOrderRepository(EntityRepository[CustomerOrder]):
 
         return self.find_all(query)
 
-    def get_positions(self, order_id: str, query_builder: Optional[QueryBuilder] = None) -> Tuple[List[Position], Meta]:
+    def get_positions(
+        self, order_id: str, query_builder: Optional[QueryBuilder] = None
+    ) -> Tuple[List[Position], Meta]:
         """
         Get order positions.
 
@@ -78,7 +85,9 @@ class CustomerOrderRepository(EntityRepository[CustomerOrder]):
         params = query_builder if query_builder else self.query()
         params.expand("assortment")
 
-        response = self.api_client.get(f"{self.entity_name}/{order_id}/positions", params=params.to_params())
+        response = self.api_client.get(
+            f"{self.entity_name}/{order_id}/positions", params=params.to_params()
+        )
 
         list_positions = ListEntity.from_dict(response, Position)
 
@@ -100,9 +109,11 @@ class CustomerOrderRepository(EntityRepository[CustomerOrder]):
         if expand:
             params.expand("agent")
 
-        response = self.api_client.get(f"{self.entity_name}/{order_id}", params=params.to_params())
+        response = self.api_client.get(
+            f"{self.entity_name}/{order_id}", params=params.to_params()
+        )
 
-        return Counterparty.from_dict(response['agent'])
+        return Counterparty.from_dict(response["agent"])
 
     def create_position(self, order_id: str, position_data: Position) -> Dict:
         """
@@ -117,11 +128,15 @@ class CustomerOrderRepository(EntityRepository[CustomerOrder]):
         """
 
         data = position_data.to_dict()
-        response = self.api_client.post(f"{self.entity_name}/{order_id}/positions", data=data)
+        response = self.api_client.post(
+            f"{self.entity_name}/{order_id}/positions", data=data
+        )
 
         return Position.from_dict(response[0])
 
-    def update_position(self, order_id: str, position_id: str, position_data: Dict) -> Dict:
+    def update_position(
+        self, order_id: str, position_id: str, position_data: Dict
+    ) -> Dict:
         """
         Update order position.
 
@@ -133,7 +148,9 @@ class CustomerOrderRepository(EntityRepository[CustomerOrder]):
         Returns:
             Updated position data
         """
-        return self.api_client.put(f"{self.entity_name}/{order_id}/positions/{position_id}", data=position_data)
+        return self.api_client.put(
+            f"{self.entity_name}/{order_id}/positions/{position_id}", data=position_data
+        )
 
     def delete_position(self, order_id: str, position_id: str) -> None:
         """
@@ -167,8 +184,9 @@ class PurchaseOrderRepository(EntityRepository[PurchaseOrder]):
         """
         return self.api_client.get(f"{self.entity_name}/metadata")
 
-    def get_by_agent(self, agent_id: str, query_builder: Optional[QueryBuilder] = None) -> Tuple[
-        List[PurchaseOrder], Meta]:
+    def get_by_agent(
+        self, agent_id: str, query_builder: Optional[QueryBuilder] = None
+    ) -> Tuple[List[PurchaseOrder], Meta]:
         """
         Get orders by agent (counterparty).
 
@@ -184,7 +202,9 @@ class PurchaseOrderRepository(EntityRepository[PurchaseOrder]):
 
         return self.find_all(query)
 
-    def get_positions(self, order_id: str, query_builder: Optional[QueryBuilder] = None) -> Tuple[List[Position], Meta]:
+    def get_positions(
+        self, order_id: str, query_builder: Optional[QueryBuilder] = None
+    ) -> Tuple[List[Position], Meta]:
         """
         Get order positions.
 
@@ -196,7 +216,9 @@ class PurchaseOrderRepository(EntityRepository[PurchaseOrder]):
             Positions data
         """
         params = query_builder.to_params() if query_builder else {}
-        response = self.api_client.get(f"{self.entity_name}/{order_id}/positions", params=params)
+        response = self.api_client.get(
+            f"{self.entity_name}/{order_id}/positions", params=params
+        )
 
         list_positions = ListEntity.from_dict(response, Position)
 
@@ -215,11 +237,15 @@ class PurchaseOrderRepository(EntityRepository[PurchaseOrder]):
         """
 
         data = position_data.to_dict()
-        response = self.api_client.post(f"{self.entity_name}/{order_id}/positions", data=data)
+        response = self.api_client.post(
+            f"{self.entity_name}/{order_id}/positions", data=data
+        )
 
         return Position.from_dict(response[0])
 
-    def update_position(self, order_id: str, position_id: str, position_data: Dict) -> Dict:
+    def update_position(
+        self, order_id: str, position_id: str, position_data: Dict
+    ) -> Dict:
         """
         Update order position.
 
@@ -231,7 +257,9 @@ class PurchaseOrderRepository(EntityRepository[PurchaseOrder]):
         Returns:
             Updated position data
         """
-        return self.api_client.put(f"{self.entity_name}/{order_id}/positions/{position_id}", data=position_data)
+        return self.api_client.put(
+            f"{self.entity_name}/{order_id}/positions/{position_id}", data=position_data
+        )
 
     def delete_position(self, order_id: str, position_id: str) -> None:
         """
@@ -243,17 +271,19 @@ class PurchaseOrderRepository(EntityRepository[PurchaseOrder]):
         """
         self.api_client.delete(f"{self.entity_name}/{order_id}/positions/{position_id}")
 
+
 class PurchaseReturnRepository(EntityRepository[PurchaseReturn]):
     """Repository for PurchaseReturn entities."""
 
     def __init__(self, api_client: ApiClient):
         """
         Initialize purchasereturn repository.
-        
+
         Args:
             api_client: API client instance
         """
         super().__init__(api_client, "entity/purchasereturn", PurchaseReturn)
+
 
 class SalesReturnRepository(EntityRepository[SalesReturn]):
     """Repository for SalesReturn entities."""
@@ -405,15 +435,44 @@ class PaymentOutRepository(EntityRepository[PaymentOut]):
             api_client: API client instance
         """
         super().__init__(api_client, "entity/paymentout", PaymentOut)
-        
+
+
 class CounterpartyAdjustmentRepository(EntityRepository[Counterparty]):
     """Repository for CounterpartyAdjustment entities."""
 
     def __init__(self, api_client: ApiClient):
         """
-        Initialize payment-out repository.
-        
+        Initialize counterparty adjustment repository.
+
         Args:
             api_client: API client instance
         """
-        super().__init__(api_client, "entity/counterpartyadjustment", CounterpartyAdjustment)
+        super().__init__(
+            api_client, "entity/counterpartyadjustment", CounterpartyAdjustment
+        )
+
+
+class EnterRepository(EntityRepository[Enter]):
+    """Repository for Enter entities."""
+
+    def __init__(self, api_client: ApiClient):
+        """
+        Initialize product enters repository.
+
+        Args:
+            api_client: API client instance
+        """
+        super().__init__(api_client, "entity/enter", Enter)
+
+
+class LossRepository(EntityRepository[Loss]):
+    """Repository for Loss entities."""
+
+    def __init__(self, api_client: ApiClient):
+        """
+        Initialize product losses repository.
+
+        Args:
+            api_client: API client instance
+        """
+        super().__init__(api_client, "entity/loss", Loss)

@@ -4,6 +4,8 @@ Main client class for the MoySklad API.
 
 from typing import Dict, Any, Optional, Type, List
 
+from moysklad_api.repositories.stock import StockReportRepository
+
 from .api_client import ApiClient
 from .config import MoySkladConfig
 from .entities.base import MetaEntity
@@ -15,12 +17,15 @@ from .repositories.products import (
     ProductFolderRepository,
     VariantRepository,
     UomRepository,
-    PriceTypeRepository, CurrencyRepository
+    PriceTypeRepository,
+    CurrencyRepository,
 )
 from .repositories.documents import (
     CustomerOrderRepository,
+    EnterRepository,
     InvoiceOutRepository,
     DemandRepository,
+    LossRepository,
     PurchaseReturnRepository,
     SupplyRepository,
     CashInRepository,
@@ -29,20 +34,20 @@ from .repositories.documents import (
     PaymentOutRepository,
     CounterpartyAdjustmentRepository,
     PurchaseOrderRepository,
-    SalesReturnRepository
+    SalesReturnRepository,
 )
 from .repositories.counterparty import CounterpartyRepository
 from .repositories.organization import (
+    GroupRepository,
     OrganizationRepository,
     EmployeeRepository,
-    StoreRepository
+    StoreRepository,
 )
 from .repositories.assortment import (
     AssortmentRepository,
     ServiceRepository,
-    BundleRepository
+    BundleRepository,
 )
-
 
 
 class MoySklad:
@@ -90,16 +95,26 @@ class MoySklad:
         self.payment_ins = PaymentInRepository(self.api_client)
         self.payment_outs = PaymentOutRepository(self.api_client)
 
+        self.stock_report = StockReportRepository(self.api_client)
+
+        self.enters = EnterRepository(self.api_client)
+        self.loss = LossRepository(self.api_client)
+
         # Counterparties
         self.counterparties = CounterpartyRepository(self.api_client)
-        self.counterparty_adjustments = CounterpartyAdjustmentRepository(self.api_client)
+        self.counterparty_adjustments = CounterpartyAdjustmentRepository(
+            self.api_client
+        )
 
         # Organization
         self.organizations = OrganizationRepository(self.api_client)
         self.employees = EmployeeRepository(self.api_client)
         self.stores = StoreRepository(self.api_client)
+        self.groups = GroupRepository(self.api_client)
 
-    def create_repository(self, entity_name: str, entity_class: Type[MetaEntity]) -> EntityRepository:
+    def create_repository(
+        self, entity_name: str, entity_class: Type[MetaEntity]
+    ) -> EntityRepository:
         """
         Create a custom repository for an entity type.
 
