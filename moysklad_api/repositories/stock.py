@@ -32,6 +32,8 @@ class StockReportRepository:
             List of Stock entities
         """
 
-        response = self.api_client.get(f"report/stock/{type}?filter=store={store_href}")
+        response = self.api_client.get(
+            f"report/stock/all?filter=store={store_href};stockMode={type}"
+        )
         rows = response.get("rows", [])
         return [StockFromReport.from_dict(row) for row in rows]
