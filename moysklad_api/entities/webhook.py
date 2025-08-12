@@ -48,6 +48,7 @@ class WebhookStock(MetaEntity):
     enabled: Optional[bool] = None
     reportType: Optional[str] = None
     stockType: Optional[str] = None
+    authorApplication: Optional[Meta] = None
     url: Optional[str] = None
 
     @classmethod
