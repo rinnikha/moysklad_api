@@ -28,7 +28,9 @@ class StockReportRepository:
         response = self.api_client.get_via_url(report_href)
         return [StockFromWebhookReport.from_dict(row) for row in response]
 
-    def get_stock_report(self, store_href: str, type: str) -> List[StockFromReport]:
+    def get_stock_report(
+        self, store_href: str, type: str, product_hrefs: List[str] = None
+    ) -> List[StockFromReport]:
         """
         Get stock info for a store.
 
@@ -40,8 +42,15 @@ class StockReportRepository:
             List of Stock entities
         """
 
+        products_filter = ""
+
+        if product_hrefs and len(product_hrefs) > 0:
+            products_filter = "".join(
+                f";product={product_href}" for product_href in product_hrefs
+            )
+
         response = self.api_client.get(
-            f"report/stock/all?filter=store={store_href};stockMode={type}"
+            f"report/stock/all?filter=store={store_href};stockMode={type}{products_filter}"
         )
         rows = response.get("rows", [])
         return [StockFromReport.from_dict(row) for row in rows]
