@@ -4,6 +4,7 @@ Document-related entity models for the MoySklad API.
 
 from dataclasses import dataclass, field
 from datetime import datetime
+from urllib.parse import urlparse
 from numbers import Number
 from typing import Dict, List, Any, Optional, ClassVar
 from decimal import Decimal
@@ -16,9 +17,19 @@ from ..constants import DocumentStatus
 class Position(MetaEntity):
     """Document position entity in MoySklad."""
 
-    quantity: Optional[int] = None
+    cost: Optional[float] = None
+    country: Optional[Meta] = None
+    gtd: Optional[Dict] = None
+    quantity: Optional[float] = None
+    pack: Optional[Dict] = None
     price: Optional[Decimal] = None
+    slot: Optional[Meta] = None
+    things: Optional[List[str]] = None
+    trackingCodes: Optional[List[Dict]] = None
+    trackingCodes_1162: Optional[List[Dict]] = None
+    overhead: Optional[float] = None
     discount: Optional[Decimal] = None
+    declaration: Optional[List[Dict]] = None
     vat: Optional[int] = None
     vatEnabled: Optional[bool] = None
     assortment: Optional[Dict] = None
@@ -47,10 +58,6 @@ class State(MetaEntity):
     stateType: Optional[str] = None
     entityType: Optional[str] = None
 
-    @staticmethod
-    def get_href(entity_id: str, entity_type: str) -> str:
-        return f"https://api.moysklad.ru/api/remap/1.2/entity/{entity_type}/metadata/states/{entity_id}"
-
 
 @dataclass
 class BaseDocument(MetaEntity):
@@ -76,6 +83,16 @@ class BaseDocument(MetaEntity):
     def __post_init__(self):
         """Post-initialization hook."""
         super().__post_init__()
+
+    def extract_id_from_href(self, href: str):
+        path = urlparse(href).path
+        parts = path.strip("/").split("/")
+
+        if self.entity_name in parts:
+            idx = parts.index(self.entity_name)
+            if idx + 1 < len(parts):
+                return parts[idx + 1]
+        return None
 
 
 @dataclass
@@ -253,13 +270,22 @@ class Supply(BaseDocument):
     agent: Optional[Dict] = None
     organization: Optional[Dict] = None
     organizationAccount: Optional[Dict] = None
+    overhead: Optional[Dict] = None
     agentAccount: Optional[Dict] = None
     store: Optional[Dict] = None
+    factureIn: Optional[Meta] = None
     positions: Optional[Dict] = None
     payedSum: Optional[int] = None
+    payments: Optional[List[Meta]] = None
+    purchaseOrder: Optional[Meta] = None
+    returns: Optional[List[Meta]] = None
+    productionTask: Optional[Meta] = None
     invoicesIn: Optional[List[Dict]] = None
     incomingNumber: Optional[str] = None
     incomingDate: Optional[str] = None
+    vatEnabled: Optional[bool] = None
+    vatIncluded: Optional[bool] = None
+    vatSum: Optional[float] = None
 
 
 @dataclass

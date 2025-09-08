@@ -62,7 +62,7 @@ class StockFromWebhookReport:
     stock: Optional[float] = None
 
     @classmethod
-    def from_dict(cls, data: Dict) -> "Stock":
+    def from_dict(cls, data: Dict) -> "StockFromWebhookReport":
         """
         Create stock entity from API response.
 

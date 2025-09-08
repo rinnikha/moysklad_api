@@ -26,6 +26,9 @@ client = MoySklad(
     debug=True,
 )
 
+report_url = "https://api.moysklad.ru/api/remap/1.2/report/stock/bystore/current?changedSince=2025-08-17 04:20:00"
+stock = client.stock_report.get_stock_from_webhook_report(report_url)
+
 
 client.product_folders.create_bulk()
 

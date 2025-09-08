@@ -21,12 +21,18 @@ class StockReportRepository:
         self.api_client = api_client
 
     def get_stock_from_webhook_report(
-        self, report_href
+        self, report_href: str, storeId: str = None
     ) -> List[StockFromWebhookReport]:
         """ """
 
         response = self.api_client.get_via_url(report_href)
-        return [StockFromWebhookReport.from_dict(row) for row in response]
+
+        stock_list = [StockFromWebhookReport.from_dict(row) for row in response]
+
+        if storeId:
+            stock_list = [stock for stock in stock_list if stock.storeId == storeId]
+
+        return stock_list
 
     def get_stock_report(
         self, store_href: str, type: str, product_hrefs: List[str] = None
@@ -42,15 +48,20 @@ class StockReportRepository:
             List of Stock entities
         """
 
-        products_filter = ""
+        products_filter = "".join(f";product={href}" for href in (product_hrefs or []))
+        url = f"report/stock/all?filter=store={store_href};stockMode={type}{products_filter}"
+        resp = self.api_client.get(url)
 
-        if product_hrefs and len(product_hrefs) > 0:
-            products_filter = "".join(
-                f";product={product_href}" for product_href in product_hrefs
-            )
+        all_rows: List[dict] = resp.get("rows", [])
 
-        response = self.api_client.get(
-            f"report/stock/all?filter=store={store_href};stockMode={type}{products_filter}"
-        )
-        rows = response.get("rows", [])
-        return [StockFromReport.from_dict(row) for row in rows]
+        meta = resp.get("meta") or {}
+        next_href = meta.get("nextHref")
+
+        while next_href:
+            resp = self.api_client.get_via_url(next_href)
+            all_rows.extend(resp.get("rows", []))
+
+            meta = resp.get("meta") or {}
+            next_href = meta.get("nextHref")
+
+        return [StockFromReport.from_dict(row) for row in all_rows]

@@ -2,6 +2,7 @@
 Assortment-related repositories for the MoySklad API.
 """
 
+from tkinter import Image
 from typing import Dict, List, Any, Optional, Tuple, Union
 
 from .base import EntityRepository
@@ -42,6 +43,16 @@ class AssortmentRepository(EntityRepository[Assortment]):
         """
         return self.api_client.get("entity/assortment/settings")
 
+    def get_image_miniature(self, images_href: str) -> str:
+        response = self.api_client.get_via_url(images_href)["rows"]
+
+        image_download_href = None
+
+        if response:
+            image_download_href = response[0]["miniature"]["downloadHref"]
+
+        return image_download_href
+
     def get_stock(self, assortment_id: str) -> Dict:
         """
         Get stock info for an assortment item.
@@ -54,8 +65,12 @@ class AssortmentRepository(EntityRepository[Assortment]):
         """
         return self.api_client.get(f"entity/assortment/{assortment_id}/stock")
 
-    def get_by_product_folder(self, folder_href: str, with_subfolders: bool = False, query_builder: Optional[QueryBuilder] = None) -> Tuple[
-        List[Assortment], Meta]:
+    def get_by_product_folder(
+        self,
+        folder_href: str,
+        with_subfolders: bool = False,
+        query_builder: Optional[QueryBuilder] = None,
+    ) -> Tuple[List[Assortment], Meta]:
         """
         Get assortment items by product folder.
 
@@ -68,7 +83,9 @@ class AssortmentRepository(EntityRepository[Assortment]):
             Tuple of (list of assortment items, metadata)
         """
         query = query_builder or self.query()
-        query.filter().eq("productFolder", folder_href).eq("withSubFolders", with_subfolders)
+        query.filter().eq("productFolder", folder_href).eq(
+            "withSubFolders", with_subfolders
+        )
 
         return self.find_all(query)
 
@@ -103,8 +120,9 @@ class AssortmentRepository(EntityRepository[Assortment]):
 
         return self.find_all(query)
 
-    def get_by_type(self, type_name: str, query_builder: Optional[QueryBuilder] = None) -> Tuple[
-        List[Assortment], Meta]:
+    def get_by_type(
+        self, type_name: str, query_builder: Optional[QueryBuilder] = None
+    ) -> Tuple[List[Assortment], Meta]:
         """
         Get assortment items by type.
 
@@ -128,7 +146,9 @@ class AssortmentRepository(EntityRepository[Assortment]):
 
         if all_pages:
             while meta.nextHref:
-                next_endpoint = meta.nextHref.removeprefix(self.api_client.config.base_url)
+                next_endpoint = meta.nextHref.removeprefix(
+                    self.api_client.config.base_url
+                )
                 response = self.api_client.get(next_endpoint)
                 next_page = ListEntity.from_dict(response, Assortment)
                 meta = next_page.meta
@@ -136,7 +156,9 @@ class AssortmentRepository(EntityRepository[Assortment]):
 
         return assortments, meta
 
-    def get_products(self, query_builder: Optional[QueryBuilder] = None) -> Tuple[List[Assortment], Meta]:
+    def get_products(
+        self, query_builder: Optional[QueryBuilder] = None
+    ) -> Tuple[List[Assortment], Meta]:
         """
         Get only products from assortment.
 
@@ -148,7 +170,9 @@ class AssortmentRepository(EntityRepository[Assortment]):
         """
         return self.get_by_type("product", query_builder)
 
-    def get_variants(self, query_builder: Optional[QueryBuilder] = None) -> Tuple[List[Assortment], Meta]:
+    def get_variants(
+        self, query_builder: Optional[QueryBuilder] = None
+    ) -> Tuple[List[Assortment], Meta]:
         """
         Get only variants from assortment.
 
@@ -160,7 +184,9 @@ class AssortmentRepository(EntityRepository[Assortment]):
         """
         return self.get_by_type("variant", query_builder)
 
-    def get_services(self, query_builder: Optional[QueryBuilder] = None) -> Tuple[List[Assortment], Meta]:
+    def get_services(
+        self, query_builder: Optional[QueryBuilder] = None
+    ) -> Tuple[List[Assortment], Meta]:
         """
         Get only services from assortment.
 
@@ -172,7 +198,9 @@ class AssortmentRepository(EntityRepository[Assortment]):
         """
         return self.get_by_type("service", query_builder)
 
-    def get_bundles(self, query_builder: Optional[QueryBuilder] = None) -> Tuple[List[Assortment], Meta]:
+    def get_bundles(
+        self, query_builder: Optional[QueryBuilder] = None
+    ) -> Tuple[List[Assortment], Meta]:
         """
         Get only bundles from assortment.
 
@@ -234,9 +262,13 @@ class BundleRepository(EntityRepository[Bundle]):
         Returns:
             Created component data
         """
-        return self.api_client.post(f"{self.entity_name}/{bundle_id}/components", data=component_data)
+        return self.api_client.post(
+            f"{self.entity_name}/{bundle_id}/components", data=component_data
+        )
 
-    def update_component(self, bundle_id: str, component_id: str, component_data: Dict) -> Dict:
+    def update_component(
+        self, bundle_id: str, component_id: str, component_data: Dict
+    ) -> Dict:
         """
         Update a component in a bundle.
 
@@ -248,7 +280,10 @@ class BundleRepository(EntityRepository[Bundle]):
         Returns:
             Updated component data
         """
-        return self.api_client.put(f"{self.entity_name}/{bundle_id}/components/{component_id}", data=component_data)
+        return self.api_client.put(
+            f"{self.entity_name}/{bundle_id}/components/{component_id}",
+            data=component_data,
+        )
 
     def delete_component(self, bundle_id: str, component_id: str) -> None:
         """
@@ -258,4 +293,6 @@ class BundleRepository(EntityRepository[Bundle]):
             bundle_id: Bundle ID
             component_id: Component ID
         """
-        self.api_client.delete(f"{self.entity_name}/{bundle_id}/components/{component_id}")
+        self.api_client.delete(
+            f"{self.entity_name}/{bundle_id}/components/{component_id}"
+        )

@@ -12,6 +12,7 @@ from ..constants import CompanyType
 @dataclass
 class Organization(MetaEntity):
     """Organization entity in MoySklad."""
+
     entity_name: ClassVar[str] = "entity/organization"
 
     actualAddress: Optional[str] = None
@@ -59,10 +60,6 @@ class Organization(MetaEntity):
     created: Optional[str] = None
     updated: Optional[str] = None
 
-    @staticmethod
-    def get_href(entity_id: str) -> str:
-        return f'https://api.moysklad.ru/api/remap/1.2/entity/organization/{entity_id}'
-
     def __post_init__(self):
         """Post-initialization hook."""
         super().__post_init__()
@@ -75,12 +72,10 @@ class Organization(MetaEntity):
                 pass
 
 
-
-
-
 @dataclass
 class Employee(MetaEntity):
     """Employee entity in MoySklad."""
+
     entity_name: ClassVar[str] = "entity/employee"
 
     firstName: Optional[str] = None
@@ -113,18 +108,16 @@ class Employee(MetaEntity):
 @dataclass
 class Group(MetaEntity):
     """Group entity in MoySklad."""
+
     entity_name: ClassVar[str] = "entity/group"
 
     index: Optional[int] = None
-
-    @staticmethod
-    def get_href(entity_id: str) -> str:
-        return f'https://api.moysklad.ru/api/remap/1.2/entity/group/{entity_id}'
 
 
 @dataclass
 class Store(MetaEntity):
     """Store entity in MoySklad."""
+
     entity_name: ClassVar[str] = "entity/store"
 
     address: Optional[str] = None
@@ -141,7 +134,3 @@ class Store(MetaEntity):
     shared: Optional[bool] = None
     zones: Optional[List[Dict]] = None
     slots: Optional[List[Dict]] = None
-
-    @staticmethod
-    def get_href(entity_id: str) -> str:
-        return f'https://api.moysklad.ru/api/remap/1.2/entity/store/{entity_id}'

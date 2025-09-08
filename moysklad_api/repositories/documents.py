@@ -297,6 +297,31 @@ class SalesReturnRepository(EntityRepository[SalesReturn]):
         """
         super().__init__(api_client, "entity/salesreturn", SalesReturn)
 
+    def get_positions(
+        self, sales_return_id: str, query_builder: Optional[QueryBuilder] = None
+    ) -> Tuple[List[Position], Meta]:
+        """
+        Get sales return positions.
+
+        Args:
+            sales_return_id: Sales Return ID
+            query_builder: Query builder for filtering, sorting, etc.
+
+        Returns:
+            Positions data
+        """
+
+        params = query_builder if query_builder else self.query()
+        params.expand("assortment")
+
+        response = self.api_client.get(
+            f"{self.entity_name}/{sales_return_id}/positions", params=params.to_params()
+        )
+
+        list_positions = ListEntity.from_dict(response, Position)
+
+        return list_positions.rows, list_positions.meta
+
 
 class InvoiceOutRepository(EntityRepository[InvoiceOut]):
     """Repository for InvoiceOut entities."""
@@ -339,6 +364,31 @@ class DemandRepository(EntityRepository[Demand]):
         """
         super().__init__(api_client, "entity/demand", Demand)
 
+    def get_positions(
+        self, demand_id: str, query_builder: Optional[QueryBuilder] = None
+    ) -> Tuple[List[Position], Meta]:
+        """
+        Get demand positions.
+
+        Args:
+            demand_id: Order ID
+            query_builder: Query builder for filtering, sorting, etc.
+
+        Returns:
+            Positions data
+        """
+
+        params = query_builder if query_builder else self.query()
+        params.expand("assortment")
+
+        response = self.api_client.get(
+            f"{self.entity_name}/{demand_id}/positions", params=params.to_params()
+        )
+
+        list_positions = ListEntity.from_dict(response, Position)
+
+        return list_positions.rows, list_positions.meta
+
     def get_by_customer_order(self, order_id: str) -> List[Demand]:
         """
         Get demands by customer order.
@@ -367,6 +417,31 @@ class SupplyRepository(EntityRepository[Supply]):
             api_client: API client instance
         """
         super().__init__(api_client, "entity/supply", Supply)
+
+    def get_positions(
+        self, supply_id: str, query_builder: Optional[QueryBuilder] = None
+    ) -> Tuple[List[Position], Meta]:
+        """
+        Get order positions.
+
+        Args:
+            order_id: Order ID
+            query_builder: Query builder for filtering, sorting, etc.
+
+        Returns:
+            Positions data
+        """
+
+        params = query_builder if query_builder else self.query()
+        params.expand("assortment")
+
+        response = self.api_client.get(
+            f"{self.entity_name}/{supply_id}/positions", params=params.to_params()
+        )
+
+        list_positions = ListEntity.from_dict(response, Position)
+
+        return list_positions.rows, list_positions.meta
 
 
 class CashInRepository(EntityRepository[CashIn]):
@@ -463,6 +538,31 @@ class EnterRepository(EntityRepository[Enter]):
             api_client: API client instance
         """
         super().__init__(api_client, "entity/enter", Enter)
+
+    def get_positions(
+        self, enter_id: str, query_builder: Optional[QueryBuilder] = None
+    ) -> Tuple[List[Position], Meta]:
+        """
+        Get .
+
+        Args:
+            order_id: Order ID
+            query_builder: Query builder for filtering, sorting, etc.
+
+        Returns:
+            Positions data
+        """
+
+        params = query_builder if query_builder else self.query()
+        params.expand("assortment")
+
+        response = self.api_client.get(
+            f"{self.entity_name}/{enter_id}/positions", params=params.to_params()
+        )
+
+        list_positions = ListEntity.from_dict(response, Position)
+
+        return list_positions.rows, list_positions.meta
 
 
 class LossRepository(EntityRepository[Loss]):

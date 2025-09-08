@@ -90,10 +90,6 @@ class Counterparty(MetaEntity):
     archived: Optional[bool] = None
     files: Optional[Dict] = None
 
-    @staticmethod
-    def get_href(entity_id: str) -> str:
-        return f"https://api.moysklad.ru/api/remap/1.2/entity/counterparty/{entity_id}"
-
     def __post_init__(self):
         """Post-initialization hook."""
         super().__post_init__()

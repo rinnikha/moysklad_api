@@ -82,7 +82,6 @@ class MoySklad:
         self.assortment = AssortmentRepository(self.api_client)
         self.services = ServiceRepository(self.api_client)
         self.bundles = BundleRepository(self.api_client)
-
         # Documents
         self.customer_orders = CustomerOrderRepository(self.api_client)
         self.purchase_orders = PurchaseOrderRepository(self.api_client)

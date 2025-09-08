@@ -95,6 +95,15 @@ class MetaEntity:
         if isinstance(self.meta, dict):
             self.meta = Meta(**self.meta)
 
+    def get_href(self) -> Optional[str]:
+        if self.id and self.entity_name:
+            return f"https://api.moysklad.ru/api/remap/1.2/entity/{self.entity_name}/{self.id}"
+        return None
+
+    @classmethod
+    def get_href(cls, entity_id: str) -> Optional[str]:
+        return f"https://api.moysklad.ru/api/remap/1.2/entity/{cls.entity_name}/{entity_id}"
+
     def to_dict(self) -> Dict:
         """
         Convert entity to a dictionary for API requests.
