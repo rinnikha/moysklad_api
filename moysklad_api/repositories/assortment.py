@@ -2,7 +2,6 @@
 Assortment-related repositories for the MoySklad API.
 """
 
-from tkinter import Image
 from typing import Dict, List, Any, Optional, Tuple, Union
 
 from .base import EntityRepository
