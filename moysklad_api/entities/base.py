@@ -2,13 +2,20 @@
 Base entity classes for the MoySklad API.
 """
 
-from dataclasses import dataclass, asdict, field
+from dataclasses import dataclass, asdict, fields, is_dataclass
 from datetime import datetime
 from typing import Dict, List, Any, Optional, ClassVar, Type, TypeVar, Generic
+from typing import Union, get_args, get_origin
 from decimal import Decimal
+import inspect
 import json
+import types
 
 from ..utils.helpers import ms_datetime_to_string
+
+_UNION_TYPES = (Union,)
+if hasattr(types, "UnionType"):
+    _UNION_TYPES = _UNION_TYPES + (types.UnionType,)
 
 
 def _convert_for_json(obj):
@@ -127,17 +134,63 @@ class MetaEntity:
     entity_name: ClassVar[str] = ""
 
     def __post_init__(self):
-        """
-        Post-initialization hook to convert dict to Meta object
-        if needed.
-        """
-        if isinstance(self.meta, dict):
-            self.meta = Meta(**self.meta)
-        if isinstance(self.attributes, list):
-            self.attributes = [
-                a if isinstance(a, Attribute) else Attribute.from_dict(a)
-                for a in self.attributes
+        """Post-initialization hook to materialize nested entities based on type hints."""
+        for field in fields(self):
+            value = getattr(self, field.name)
+            if value is None:
+                continue
+
+            converted = self._convert_field_value(field.type, value)
+            setattr(self, field.name, converted)
+
+    @classmethod
+    def _convert_field_value(cls, annotation, value):
+        """Convert field value into entity/dataclass instances when applicable."""
+        if value is None:
+            return None
+
+        origin = get_origin(annotation)
+
+        # Handle Optional/Union types (including PEP 604 unions)
+        if origin in _UNION_TYPES:
+            non_none_args = [arg for arg in get_args(annotation) if arg is not type(None)]
+            if len(non_none_args) == 1:
+                return cls._convert_field_value(non_none_args[0], value)
+            return value
+
+        # Handle collections (currently list/tuple are most common in API payloads)
+        if origin in (list, tuple):
+            if not isinstance(value, (list, tuple)):
+                return value
+            item_args = get_args(annotation)
+            item_type = item_args[0] if item_args else Any
+            converted_items = [
+                cls._convert_field_value(item_type, item) for item in value
             ]
+            return tuple(converted_items) if isinstance(value, tuple) else converted_items
+
+        # Leave dictionaries as-is; caller can keep typing as Dict when raw payload expected
+        if origin in (dict, Dict):
+            return value
+
+        if inspect.isclass(annotation):
+            # Convert nested MetaEntity subclasses using their own from_dict logic
+            if issubclass(annotation, MetaEntity):
+                if isinstance(value, annotation):
+                    return value
+                if isinstance(value, dict):
+                    return annotation.from_dict(value)
+                return value
+
+            # Convert other dataclasses (Meta, Attribute, Rate, etc.)
+            if is_dataclass(annotation):
+                if isinstance(value, annotation):
+                    return value
+                if isinstance(value, dict):
+                    return annotation(**value)
+                return value
+
+        return value
 
     def get_href(self) -> Optional[str]:
         if self.id and self.entity_name:
