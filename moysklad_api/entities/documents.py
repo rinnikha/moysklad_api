@@ -150,7 +150,7 @@ class CustomerOrder(BaseDocument):
 class PurchaseOrder(BaseDocument):
     """Customer Order entity in MoySklad."""
 
-    entity_name: ClassVar[str] = "entity/customerorder"
+    entity_name: ClassVar[str] = "entity/purchaseorder"
 
     store: Optional[Dict] = None
     agent: Optional[Dict] = None
