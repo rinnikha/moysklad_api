@@ -9,6 +9,9 @@ from numbers import Number
 from typing import Dict, List, Any, Optional, ClassVar
 from decimal import Decimal
 
+from moysklad_api.entities.organization import Organization
+from moysklad_api.entities.products import Currency
+
 from .base import Meta, MetaEntity
 from ..constants import DocumentStatus
 
@@ -60,6 +63,18 @@ class State(MetaEntity):
 
 
 @dataclass
+class Rate:
+    """Document rate object with currency and rate"""
+    currency: Optional[Currency] = None
+    value: Optional[float] = 1
+
+    def __post_init__(self):
+        if isinstance(self.currency, dict):
+            self.currency = Currency(**self.currency)
+
+
+
+@dataclass
 class BaseDocument(MetaEntity):
     """Base document entity in MoySklad."""
 
@@ -70,7 +85,7 @@ class BaseDocument(MetaEntity):
     externalCode: Optional[str] = None
     moment: Optional[datetime] = None
     applicable: Optional[bool] = None
-    rate: Optional[Dict] = None
+    rate: Optional[Rate] = None
     sum: Optional[Decimal] = None
     syncId: Optional[str] = None
     project: Optional[Dict] = None
@@ -84,6 +99,9 @@ class BaseDocument(MetaEntity):
         """Post-initialization hook."""
         super().__post_init__()
 
+        if isinstance(self.rate, dict):
+            self.rate = Rate(**self.rate)
+
     def extract_id_from_href(self, href: str):
         path = urlparse(href).path
         parts = path.strip("/").split("/")
@@ -93,6 +111,8 @@ class BaseDocument(MetaEntity):
             if idx + 1 < len(parts):
                 return parts[idx + 1]
         return None
+
+
 
 
 @dataclass
@@ -268,7 +288,7 @@ class Supply(BaseDocument):
     entity_name: ClassVar[str] = "entity/supply"
 
     agent: Optional[Dict] = None
-    organization: Optional[Dict] = None
+    organization: Optional[Organization] = None
     organizationAccount: Optional[Dict] = None
     overhead: Optional[Dict] = None
     agentAccount: Optional[Dict] = None
@@ -294,9 +314,9 @@ class CashIn(BaseDocument):
 
     entity_name: ClassVar[str] = "entity/cashin"
 
-    agent: Optional[Dict] = None
+    agent: Optional[MetaEntity] = None
     code: Optional[str] = None
-    organization: Optional[Dict] = None
+    organization: Optional[Organization] = None
     contract: Optional[Dict] = None
     paymentPurpose: Optional[str] = None
     salesChannel: Optional[Dict] = None

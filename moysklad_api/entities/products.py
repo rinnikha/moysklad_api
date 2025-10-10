@@ -23,20 +23,6 @@ class Barcode(MetaEntity):
 
 
 @dataclass
-class Price:
-    """Price entity in MoySklad."""
-
-    value: Decimal
-    currency: Dict
-    priceType: Optional[Dict] = None
-
-    def __post_init__(self):
-        """Convert string to Decimal if needed."""
-        if isinstance(self.value, (str, int, float)):
-            self.value = Decimal(str(self.value))
-
-
-@dataclass
 class Image(MetaEntity):
     """Image entity in MoySklad."""
 
@@ -92,6 +78,21 @@ class Currency(MetaEntity):
     system: Optional[bool] = None
     archived: Optional[bool] = None
 
+@dataclass
+class Price:
+    """Price entity in MoySklad."""
+
+    value: Decimal
+    currency: Optional[Currency] = None
+    priceType: Optional[Dict] = None
+
+    def __post_init__(self):
+        """Convert string to Decimal if needed."""
+        if isinstance(self.currency, dict):
+            self.currency = Currency(**self.currency)
+
+        if isinstance(self.value, (str, int, float)):
+            self.value = Decimal(str(self.value))
 
 @dataclass
 class PriceType(MetaEntity):

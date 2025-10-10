@@ -26,6 +26,9 @@ def _convert_for_json(obj):
     return obj
 
 
+
+
+
 @dataclass
 class Meta:
     """Represents MoySklad entity metadata."""
@@ -71,6 +74,42 @@ class Meta:
             return None
         return cls(**data)
 
+@dataclass
+class Attribute:
+    """Attribute data of the entity"""
+
+    meta: Optional[Meta] = None
+    id: Optional[str] = None
+    name: Optional[str] = None
+    required: Optional[bool] = None
+    customEntityMeta: Optional[Meta] = None
+    file: Optional[Dict] = None
+    show: Optional[bool] = None
+    type: Optional[str] = None
+    value: Optional[object] = None
+
+    def __post_init__(self):
+        if isinstance(self.meta, dict):
+            self.meta = Meta(**self.meta)
+        if isinstance(self.customEntityMeta, dict):
+            self.customEntityMeta = Meta(**self.customEntityMeta)
+
+    @classmethod
+    def from_dict(cls, data: Dict) -> Optional["Attribute"]:
+        """
+        Create an entity from a dictionary.
+
+        Args:
+            data: Dictionary data from API
+
+        Returns:
+            A new entity instance
+        """
+
+        if not data:
+            return None
+        return cls(**data)
+
 
 @dataclass
 class MetaEntity:
@@ -79,7 +118,7 @@ class MetaEntity:
     meta: Optional[Meta] = None
     id: Optional[str] = None
     accountId: Optional[str] = None
-    attributes: Optional[List[Dict]] = None
+    attributes: Optional[List[Attribute]] = None
     created: Optional[datetime] = None
     updated: Optional[datetime] = None
     name: Optional[str] = None
@@ -94,15 +133,41 @@ class MetaEntity:
         """
         if isinstance(self.meta, dict):
             self.meta = Meta(**self.meta)
+        if isinstance(self.attributes, list):
+            self.attributes = [
+                a if isinstance(a, Attribute) else Attribute.from_dict(a)
+                for a in self.attributes
+            ]
 
     def get_href(self) -> Optional[str]:
         if self.id and self.entity_name:
-            return f"https://api.moysklad.ru/api/remap/1.2/entity/{self.entity_name}/{self.id}"
+            return f"https://api.moysklad.ru/api/remap/1.2/{self.entity_name}/{self.id}"
+        return None
+
+    def get_attribute_value(self, attribute_id: str):
+        """Get value of attribute
+
+        Args:
+            attribute_id (str): Id of attribute
+
+        Returns:
+            object: value of attribute
+        """
+        if not self.attributes:
+            return None
+
+        for attribute in self.attributes:
+            if attribute.id == attribute_id:
+                return attribute.value
         return None
 
     @classmethod
     def get_href(cls, entity_id: str) -> Optional[str]:
         return f"https://api.moysklad.ru/api/remap/1.2/entity/{cls.entity_name}/{entity_id}"
+
+    @classmethod
+    def get_attribute_href(cls, attribute_id: str) -> Optional[str]:
+        return f"https://api.moysklad.ru/api/remap/1.2/entity/{cls.entity_name}/metadata/attributes/{attribute_id}"
 
     def to_dict(self) -> Dict:
         """
@@ -131,6 +196,7 @@ class MetaEntity:
 
         if not data:
             return None
+
         return cls(**data)
 
 
