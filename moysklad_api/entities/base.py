@@ -7,6 +7,7 @@ from datetime import datetime
 from typing import Dict, List, Any, Optional, ClassVar, Type, TypeVar, Generic
 from typing import Union, get_args, get_origin
 from decimal import Decimal
+from urllib.parse import urlparse
 import inspect
 import json
 import types
@@ -191,6 +192,27 @@ class MetaEntity:
                 return value
 
         return value
+
+    def get_id(self) -> Optional[str]:
+        if self.id:
+            return self.id
+
+        if self.meta and self.meta.href:
+            path_parts = [part for part in urlparse(self.meta.href).path.split("/") if part]
+
+            if self.entity_name:
+                entity_parts = [part for part in self.entity_name.split("/") if part]
+
+                for index in range(len(path_parts) - len(entity_parts) + 1):
+                    if path_parts[index : index + len(entity_parts)] == entity_parts:
+                        candidate_index = index + len(entity_parts)
+                        if candidate_index < len(path_parts):
+                            return path_parts[candidate_index]
+
+            if path_parts:
+                return path_parts[-1]
+
+        return None
 
     def get_href(self) -> Optional[str]:
         if self.id and self.entity_name:

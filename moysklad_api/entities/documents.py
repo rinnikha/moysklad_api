@@ -102,16 +102,6 @@ class BaseDocument(MetaEntity):
         if isinstance(self.rate, dict):
             self.rate = Rate(**self.rate)
 
-    def extract_id_from_href(self, href: str):
-        path = urlparse(href).path
-        parts = path.strip("/").split("/")
-
-        if self.entity_name in parts:
-            idx = parts.index(self.entity_name)
-            if idx + 1 < len(parts):
-                return parts[idx + 1]
-        return None
-
 
 
 
