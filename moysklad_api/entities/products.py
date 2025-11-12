@@ -136,7 +136,6 @@ class Product(MetaEntity):
     buyPrice: Optional[Dict] = None
     salePrices: Optional[List[Dict]] = None
     supplier: Optional[Dict] = None
-    attributes: Optional[List[Dict]] = None
     country: Optional[Dict] = None
     article: Optional[str] = None
     weighed: Optional[bool] = None

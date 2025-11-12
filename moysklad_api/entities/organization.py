@@ -50,6 +50,7 @@ class Organization(MetaEntity):
     payerVat105: Optional[bool] = None
     certificateDate: Optional[str] = None
     chiefAccountant: Optional[str] = None
+    companyVat__ru: Optional[Dict] = None
     certificateNumber: Optional[str] = None
     director: Optional[str] = None
     directorPosition: Optional[str] = None

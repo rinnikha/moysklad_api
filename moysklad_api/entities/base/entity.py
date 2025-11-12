@@ -1,122 +1,56 @@
 """
-Base entity classes for the MoySklad API.
+Entity base classes for MoySklad.
 """
 
-from dataclasses import dataclass, asdict, fields, is_dataclass
-from datetime import datetime
-from typing import Dict, List, Any, Optional, ClassVar, Type, TypeVar, Generic
-from typing import Union, get_args, get_origin
-from decimal import Decimal
-from urllib.parse import urlparse
-import inspect
-import json
-import types
+from __future__ import annotations
 
-from ..utils.helpers import ms_datetime_to_string
+from dataclasses import asdict, dataclass, fields, is_dataclass
+from datetime import datetime
+from decimal import Decimal
+import inspect
+import types
+import sys
+from functools import lru_cache
+from typing import Any, ClassVar, Dict, Generic, List, Optional, Type, TypeVar, Union, get_args, get_origin, get_type_hints
+from urllib.parse import urlparse
+
+from ...utils.helpers import ms_datetime_to_string
+from .attributes import Attribute, AttributeCollection
+from .meta import Meta
 
 _UNION_TYPES = (Union,)
 if hasattr(types, "UnionType"):
-    _UNION_TYPES = _UNION_TYPES + (types.UnionType,)
+    _UNION_TYPES = _UNION_TYPES + (types.UnionType,)  # type: ignore[assignment]
 
 
 def _convert_for_json(obj):
     """Convert special types to JSON-serializable formats and remove None values."""
     if isinstance(obj, Decimal):
         return float(obj)
-    elif isinstance(obj, datetime):
+    if isinstance(obj, datetime):
         return ms_datetime_to_string(obj)  # Converts to ISO 8601 format string
-    elif isinstance(obj, dict):
+    if is_dataclass(obj):
+        return _convert_for_json(asdict(obj))
+    if isinstance(obj, dict):
         # Filter out None values in dictionaries at any nesting level
         return {k: _convert_for_json(v) for k, v in obj.items() if v is not None}
-    elif isinstance(obj, list):
-        # Process each item in the list
+    if isinstance(obj, (list, tuple)):
+        # Process each item in the sequence
         return [_convert_for_json(item) for item in obj]
+    if isinstance(obj, AttributeCollection):
+        return [_convert_for_json(item) for item in list(obj)]
     return obj
 
 
+def _get_resolved_type_hints(cls: Type) -> Dict[str, Any]:
+    """Return cached typing hints for the provided class."""
+    module_dict = sys.modules[cls.__module__].__dict__
+    base_module_dict = sys.modules[MetaEntity.__module__].__dict__
+    combined_globals = {**base_module_dict, **module_dict}
+    return get_type_hints(cls, globalns=combined_globals, localns=combined_globals)
 
 
-
-@dataclass
-class Meta:
-    """Represents MoySklad entity metadata."""
-
-    href: str
-    metadataHref: Optional[str] = None
-    type: Optional[str] = None
-    mediaType: Optional[str] = None
-    uuidHref: Optional[str] = None
-    downloadHref: Optional[str] = None
-    nextHref: Optional[str] = None
-    previousHref: Optional[str] = None
-    size: Optional[int] = None
-    limit: Optional[int] = None
-    offset: Optional[int] = None
-
-    @classmethod
-    def create_default(cls, href: str = "") -> "Meta":
-        """
-        Create a default Meta object with minimal required fields.
-
-        Args:
-            href: The href URL (can be empty for new entities)
-
-        Returns:
-            A new Meta instance
-        """
-        return cls(href=href)
-
-    @classmethod
-    def from_dict(cls, data: Dict) -> "Meta":
-        """
-        Create an entity from a dictionary.
-
-        Args:
-            data: Dictionary data from API
-
-        Returns:
-            A new entity instance
-        """
-
-        if not data:
-            return None
-        return cls(**data)
-
-@dataclass
-class Attribute:
-    """Attribute data of the entity"""
-
-    meta: Optional[Meta] = None
-    id: Optional[str] = None
-    name: Optional[str] = None
-    required: Optional[bool] = None
-    customEntityMeta: Optional[Meta] = None
-    file: Optional[Dict] = None
-    show: Optional[bool] = None
-    type: Optional[str] = None
-    value: Optional[object] = None
-
-    def __post_init__(self):
-        if isinstance(self.meta, dict):
-            self.meta = Meta(**self.meta)
-        if isinstance(self.customEntityMeta, dict):
-            self.customEntityMeta = Meta(**self.customEntityMeta)
-
-    @classmethod
-    def from_dict(cls, data: Dict) -> Optional["Attribute"]:
-        """
-        Create an entity from a dictionary.
-
-        Args:
-            data: Dictionary data from API
-
-        Returns:
-            A new entity instance
-        """
-
-        if not data:
-            return None
-        return cls(**data)
+_get_resolved_type_hints = lru_cache(maxsize=None)(_get_resolved_type_hints)
 
 
 @dataclass
@@ -126,7 +60,7 @@ class MetaEntity:
     meta: Optional[Meta] = None
     id: Optional[str] = None
     accountId: Optional[str] = None
-    attributes: Optional[List[Attribute]] = None
+    attributes: Optional[AttributeCollection] = None
     created: Optional[datetime] = None
     updated: Optional[datetime] = None
     name: Optional[str] = None
@@ -136,13 +70,17 @@ class MetaEntity:
 
     def __post_init__(self):
         """Post-initialization hook to materialize nested entities based on type hints."""
+        type_hints = _get_resolved_type_hints(type(self))
         for field in fields(self):
             value = getattr(self, field.name)
             if value is None:
                 continue
 
-            converted = self._convert_field_value(field.type, value)
+            annotation = type_hints.get(field.name, field.type)
+            converted = self._convert_field_value(annotation, value)
             setattr(self, field.name, converted)
+
+        self._bind_attribute_collection()
 
     @classmethod
     def _convert_field_value(cls, annotation, value):
@@ -193,6 +131,24 @@ class MetaEntity:
 
         return value
 
+    def _bind_attribute_collection(self) -> None:
+        if self.attributes is None:
+            return
+        if isinstance(self.attributes, AttributeCollection):
+            self.attributes.bind(self)
+            return
+        # If attributes were provided as a plain list, convert them
+        self.attributes = AttributeCollection(self.attributes, owner=self)
+
+    def _get_attribute_collection(self) -> AttributeCollection:
+        if self.attributes is None:
+            self.attributes = AttributeCollection(owner=self)
+        elif not isinstance(self.attributes, AttributeCollection):
+            self.attributes = AttributeCollection(self.attributes, owner=self)
+        else:
+            self.attributes.bind(self)
+        return self.attributes
+
     def get_id(self) -> Optional[str]:
         if self.id:
             return self.id
@@ -219,30 +175,43 @@ class MetaEntity:
             return f"https://api.moysklad.ru/api/remap/1.2/{self.entity_name}/{self.id}"
         return None
 
-    def get_attribute_value(self, attribute_id: str):
-        """Get value of attribute
-
-        Args:
-            attribute_id (str): Id of attribute
-
-        Returns:
-            object: value of attribute
-        """
-        if not self.attributes:
+    def add_attribute(self, attribute_id: str, value: object, **extra_fields) -> Optional[Attribute]:
+        """Add attribute with meta and value to entity."""
+        if not self.entity_name:
             return None
 
-        for attribute in self.attributes:
-            if attribute.id == attribute_id:
-                return attribute.value
-        return None
+        collection = self._get_attribute_collection()
+        return collection.add(attribute_id, value, **extra_fields)
+
+    def create_or_update_attribute(self, attribute_id: str, value: object, **extra_fields) -> Optional[Attribute]:
+        """Update an existing attribute or create one if it does not exist."""
+        if not self.entity_name:
+            return None
+
+        collection = self._get_attribute_collection()
+        return collection.update(attribute_id, value, **extra_fields)
+
+    def remove_attribute(self, attribute_id: str) -> Optional[Attribute]:
+        """Remove attribute by identifier."""
+        if not self.attributes:
+            return None
+        self._bind_attribute_collection()
+        return self.attributes.remove_by_id(attribute_id)
+
+    def get_attribute_value(self, attribute_id: str):
+        """Get value of attribute."""
+        if not self.attributes:
+            return None
+        self._bind_attribute_collection()
+        return self.attributes.get_value(attribute_id)
 
     @classmethod
     def get_href(cls, entity_id: str) -> Optional[str]:
-        return f"https://api.moysklad.ru/api/remap/1.2/entity/{cls.entity_name}/{entity_id}"
+        return f"https://api.moysklad.ru/api/remap/1.2/{cls.entity_name}/{entity_id}"
 
     @classmethod
     def get_attribute_href(cls, attribute_id: str) -> Optional[str]:
-        return f"https://api.moysklad.ru/api/remap/1.2/entity/{cls.entity_name}/metadata/attributes/{attribute_id}"
+        return f"https://api.moysklad.ru/api/remap/1.2/{cls.entity_name}/metadata/attributes/{attribute_id}"
 
     def to_dict(self) -> Dict:
         """

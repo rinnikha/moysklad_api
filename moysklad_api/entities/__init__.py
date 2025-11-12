@@ -2,7 +2,7 @@
 Entity models for the MoySklad API.
 """
 
-from .base import Meta, MetaEntity, ListEntity
+from .base import Meta, MetaEntity, ListEntity, Attribute, AttributeCollection
 from .products import Product, ProductFolder, Variant, Uom, Barcode, Price, Image
 from .documents import (
     CustomerOrder,
