@@ -126,7 +126,10 @@ class MetaEntity:
                 if isinstance(value, annotation):
                     return value
                 if isinstance(value, dict):
-                    return annotation(**value)
+                    # Filter out unknown fields for other dataclasses too
+                    known_fields = {f.name for f in fields(annotation)}
+                    filtered_value = {k: v for k, v in value.items() if k in known_fields}
+                    return annotation(**filtered_value)
                 return value
 
         return value
@@ -241,7 +244,11 @@ class MetaEntity:
         if not data:
             return None
 
-        return cls(**data)
+        # Filter out unknown fields to handle future API additions gracefully
+        known_fields = {f.name for f in fields(cls)}
+        filtered_data = {k: v for k, v in data.items() if k in known_fields}
+
+        return cls(**filtered_data)
 
 
 T = TypeVar("T", bound=MetaEntity)
